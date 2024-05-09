@@ -6,7 +6,7 @@ dotenv.config();
 
 const prisma = new PrismaClient();
 const app = express();
-const PORT: string = process.env.PORT!;
+const PORT: number = Number(process.env.PORT)!;
 const DATABASE_URL: string = process.env.DATABASE_URL!;
 
 app.use(express.json());
@@ -23,7 +23,7 @@ app.get("/api/users", async (_req: Request, res: Response) => {
 
 // get 1 user
 app.get("/api/users/:id", async (req: Request, res: Response) => {
-  const userId = parseInt(req.params.id);
+  const userId = Number(req.params.id);
   try {
     const user = await prisma.user.findUnique({
       where: { user_id: userId },
@@ -62,7 +62,7 @@ app.post("/api/users", async (req: Request, res: Response) => {
 
 // update user
 app.put("/api/users/:id", async (req: Request, res: Response) => {
-  const userId = parseInt(req.params.id);
+  const userId = Number(req.params.id);
   const { first_name, last_name, age, email, password, type, image } = req.body;
   try {
     const updatedUser = await prisma.user.update({
@@ -86,7 +86,7 @@ app.put("/api/users/:id", async (req: Request, res: Response) => {
 
 // delete user
 app.delete("/api/users/:id", async (req: Request, res: Response) => {
-  const userId = parseInt(req.params.id);
+  const userId = Number(req.params.id);
   try {
     await prisma.user.delete({
       where: { user_id: userId },

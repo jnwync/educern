@@ -1,7 +1,8 @@
+"use client";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-const LoginRegisterForm: React.FC = () => {
+export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -101,6 +102,4 @@ const LoginRegisterForm: React.FC = () => {
       </div>
     </div>
   );
-};
-
-export default LoginRegisterForm;
+}

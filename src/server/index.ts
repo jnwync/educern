@@ -6,9 +6,7 @@ import prisma from "./prisma";
 dotenv.config();
 
 const app = express();
-const PORT: string | number = process.env.PORT
-  ? parseInt(process.env.PORT)
-  : 5000;
+const PORT: number = Number(process.env.PORT);
 
 app.use(express.json());
 

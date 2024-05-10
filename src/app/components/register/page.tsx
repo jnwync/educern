@@ -64,8 +64,12 @@ export default function RegisterPage() {
           </svg>
         </button>
         <div className="w-full md:flex">
-          <div className="hidden w-1/2 bg-[#000842] px-10 py-10 md:block">
-            {/* SVG content */}
+          <div className=" hidden w-1/2 bg-[#000842] px-10 py-10 md:block">
+            <img
+              src="https://i.ibb.co/wMhhRCc/5.png"
+              alt="Registration Image"
+              className="h-auto w-full rounded-2xl"
+            />
           </div>
           <div className="w-full px-5 py-10 md:w-1/2 md:px-10">
             <div className="mb-10 text-center">
@@ -131,7 +135,7 @@ export default function RegisterPage() {
                   </div>
                 </div>
                 <div className="-mx-3 flex">
-                  <div className="mb-12 w-full px-3">
+                  <div className="mb-5 w-full px-3">
                     <label className="px-1 text-xs font-semibold">
                       Password
                     </label>

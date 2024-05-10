@@ -227,8 +227,8 @@ export default function LoginPage() {
           </div>
           <div className="rounded-xl bg-[#000842] p-8 max-md:mt-10 md:h-full lg:p-12">
             <img
-              src="https://readymadeui.com/signin-image.webp"
-              className="h-full w-full object-contain"
+              src="https://i.ibb.co/pKq73Lx/educern-4.png"
+              className="h-full w-full -scale-x-100 transform rounded-3xl object-contain"
               alt="login-image"
             />
           </div>

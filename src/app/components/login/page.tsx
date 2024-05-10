@@ -41,12 +41,12 @@ export default function LoginPage() {
               <div className="mb-12">
                 <h3 className="text-3xl font-extrabold">Sign in</h3>
                 <p className="mt-4 text-sm ">
-                  Don't have an account{" "}
+                  Don't have an account?{" "}
                   <Link
                     href="/components/register"
                     className="ml-1 whitespace-nowrap font-semibold text-blue-600 hover:underline"
                   >
-                    Register here
+                    Register here!
                   </Link>
                 </p>
               </div>
@@ -225,7 +225,7 @@ export default function LoginPage() {
               </div>
             </form>
           </div>
-          <div className="rounded-xl bg-[#000842] p-8 max-md:mt-10 md:h-full lg:p-12">
+          <div className="rounded-xl bg-blue-600 p-8 max-md:mt-10 md:h-full lg:p-12">
             <img
               src="https://i.ibb.co/pKq73Lx/educern-4.png"
               className="h-full w-full -scale-x-100 transform rounded-3xl object-contain"

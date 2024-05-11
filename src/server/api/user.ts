@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-misused-promises */
 import { PrismaClient } from "@prisma/client";
 import express, { Request, Response } from "express";
 import dotenv from "dotenv";
@@ -11,7 +13,7 @@ const DATABASE_URL: string = process.env.DATABASE_URL!;
 
 app.use(express.json());
 
-app.get("/api/users", async (_req: Request, res: Response) => {
+app.get("/api/users", async (req: Request, res: Response) => {
   try {
     const users = await prisma.user.findMany();
     res.json(users);
@@ -21,9 +23,28 @@ app.get("/api/users", async (_req: Request, res: Response) => {
   }
 });
 
+
+app.get('/getTheUser', async(req: Request, res: Response) => {
+  const id = Number(req.params.id)
+  try {
+    const getUser = await prisma.user.findUnique({
+      where : {
+        user_id : id
+      },
+    })
+    if (!getUser) {
+      res.status(404).json({error: 'User not found.'})
+    } else {
+      res.json(getUser)
+    }
+  } catch(error: unknown) {
+    console.error(error)
+  }
+})
+
 // get 1 user
 app.get("/api/users/:id", async (req: Request, res: Response) => {
-  const userId = parseInt(req.params.id);
+  const userId = Number(req.params.id);
   try {
     const user = await prisma.user.findUnique({
       where: { user_id: userId },
@@ -62,7 +83,7 @@ app.post("/api/users", async (req: Request, res: Response) => {
 
 // update user
 app.put("/api/users/:id", async (req: Request, res: Response) => {
-  const userId = parseInt(req.params.id);
+  const userId = Number(req.params.id);
   const { first_name, last_name, age, email, password, type, image } = req.body;
   try {
     const updatedUser = await prisma.user.update({
@@ -86,7 +107,7 @@ app.put("/api/users/:id", async (req: Request, res: Response) => {
 
 // delete user
 app.delete("/api/users/:id", async (req: Request, res: Response) => {
-  const userId = parseInt(req.params.id);
+  const userId = Number(req.params.id)
   try {
     await prisma.user.delete({
       where: { user_id: userId },

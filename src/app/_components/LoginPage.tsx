@@ -1,25 +1,29 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 
-const LoginRegisterForm: React.FC = () => {
-  const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+interface LoginFormData {
+  email: string;
+  password: string;
+}
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
+const LoginRegisterForm: React.FC = () => {
+  const [login, setLogin] = useState<LoginFormData>({ email: '', password: '' });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    fetchUsers();
-    console.log("Email:", email);
-    console.log("Password:", password);
+    void fetchUsers(login.email, login.password);
   };
 
-  const fetchUsers = async () => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, field: keyof LoginFormData) => {
+    setLogin(prevState => ({
+      ...prevState,
+      [field]: e.target.value
+    }));
+  };
+
+  const fetchUsers = async (email: string, password: string) => {
     try {
-      const response = await axios.get("/api/users");
+      const response = await axios.get("/api/users", { params: { email, password } });
       console.log(response.data);
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -30,7 +34,7 @@ const LoginRegisterForm: React.FC = () => {
     <div className="flex min-h-screen flex-col justify-center bg-gray-100 py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <h2 className="text-center text-3xl font-extrabold text-gray-900">
-          {isLogin ? "Sign in to your account" : "Create an account"}
+          Sign in to your account
         </h2>
         <div className="mt-8 bg-white px-4 py-8 shadow sm:rounded-lg sm:px-10">
           <form className="space-y-6" onSubmit={handleSubmit}>
@@ -48,8 +52,8 @@ const LoginRegisterForm: React.FC = () => {
                   type="email"
                   autoComplete="email"
                   required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={login.email}
+                  onChange={(e) => handleInputChange(e, 'email')}
                   className="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
                 />
               </div>
@@ -69,22 +73,10 @@ const LoginRegisterForm: React.FC = () => {
                   type="password"
                   autoComplete="current-password"
                   required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={login.password}
+                  onChange={(e) => handleInputChange(e, 'password')}
                   className="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
                 />
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="text-sm">
-                <button
-                  type="button"
-                  onClick={() => setIsLogin(!isLogin)}
-                  className="font-medium text-indigo-600 hover:text-indigo-500"
-                >
-                  {isLogin ? "Create an account" : "Sign in"}
-                </button>
               </div>
             </div>
 
@@ -93,7 +85,7 @@ const LoginRegisterForm: React.FC = () => {
                 type="submit"
                 className="flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
               >
-                {isLogin ? "Sign in" : "Register"}
+                Sign in
               </button>
             </div>
           </form>

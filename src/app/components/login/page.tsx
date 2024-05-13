@@ -33,9 +33,9 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="font-sans text-[#333]">
+    <div className="font-sans text-[#fafafa] bg-[#292524]">
       <div className="flex min-h-screen flex-col items-center justify-center">
-        <div className="m-4 grid w-full max-w-6xl items-center gap-4 rounded-md p-4 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.3)] md:grid-cols-2">
+        <div className="m-4 grid w-full max-w-6xl items-center gap-4 rounded-md p-4 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.3)] md:grid-cols-2 bg-[#1c1917]">
           <div className="w-full py-4 sm:px-6 md:max-w-md">
             <form>
               <div className="mb-12">
@@ -59,7 +59,7 @@ export default function LoginPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="w-full border-b border-gray-300 px-2 py-3 text-sm outline-none focus:border-[#333]"
+                    className="w-full border-b border-gray-300 px-2 py-3 text-sm outline-none focus:border-[#333] rounded-full px-4 py-2"
                     placeholder="example@educern.com"
                   />
                   <svg
@@ -105,7 +105,7 @@ export default function LoginPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="w-full border-b border-gray-300 px-2 py-3 text-sm outline-none focus:border-[#333]"
+                    className="w-full border-b border-gray-300 px-2 py-3 text-sm outline-none focus:border-[#333] rounded-full px-4 py-2"
                     placeholder="iloveeducern"
                   />
                   <svg

@@ -1,17 +1,27 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+
+interface FormData {
+  first_name: string;
+  last_name: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
 
 export default function RegisterPage() {
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
+  const [formData, setFormData] = useState<FormData>({
+    first_name: "",
+    last_name: "",
     email: "",
     password: "",
     confirmPassword: "",
   });
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [errors, setErrors] = useState<Partial<FormData>>({});
+  const navigate = useNavigate();
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -22,22 +32,62 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
-    // try {
-    //   // You need to send the formData object to your backend API
-    //   const response = await axios.post("/api/register", formData);
-    //   setMessage(response.data.message);
-    //   router.push("/login");
-    // } catch (error) {
-    //   setMessage("An error occurred. Please try again.");
-    // } finally {
-    //   setLoading(false);
-    // }
-    console.log("Form Data Submitted:", formData);
+    const formErrors = validateForm();
+    if (Object.keys(formErrors).length === 0) {
+      setLoading(true);
+      try {
+        const { confirmPassword, ...submitData } = formData;
+        e;
+        const response = await axios.post(
+          "http://localhost:3000/users/",
+          submitData
+        );
+        console.log(response.data);
+        navigate("/");
+      } catch (error) {
+        console.log("An error occurred. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+      console.log("Form Data Submitted:", formData);
+    } else {
+      setErrors(formErrors);
+    }
   };
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
+  };
+
+  //Form validation sa register
+  const validateForm = () => {
+    let formErrors: Partial<FormData> = {};
+
+    if (!/^[A-Za-z]+$/.test(formData.first_name)) {
+      formErrors.first_name = "First name should contain only letters.";
+    }
+    if (!/^[A-Za-z]+$/.test(formData.last_name)) {
+      formErrors.last_name = "Last name should contain only letters.";
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      formErrors.email = "Invalid email format.";
+    }
+
+    if (
+      formData.password.length < 8 ||
+      formData.password.length > 16 ||
+      !/\d/.test(formData.password)
+    ) {
+      formErrors.password =
+        "Password must be 8-16 characters and include at least one number.";
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      formErrors.confirmPassword = "Passwords do not match.";
+    }
+
+    return formErrors;
   };
 
   return (
@@ -63,13 +113,16 @@ export default function RegisterPage() {
                 <div className="relative flex items-center">
                   <input
                     type="text"
-                    name="firstName"
-                    value={formData.firstName}
+                    name="first_name"
+                    value={formData.first_name}
                     onChange={handleChange}
                     required
                     className="w-full border-b border-gray-300 px-2 py-3 text-sm outline-none focus:border-[#333]"
                     placeholder="John"
                   />
+                  {errors.first_name && (
+                    <p className="text-xs text-red-500">{errors.first_name}</p>
+                  )}
                 </div>
               </div>
               <div className="mt-8">
@@ -77,13 +130,16 @@ export default function RegisterPage() {
                 <div className="relative flex items-center">
                   <input
                     type="text"
-                    name="lastName"
-                    value={formData.lastName}
+                    name="last_name"
+                    value={formData.last_name}
                     onChange={handleChange}
                     required
                     className="w-full border-b border-gray-300 px-2 py-3 text-sm outline-none focus:border-[#333]"
                     placeholder="Smith"
                   />
+                  {errors.last_name && (
+                    <p className="text-xs text-red-500">{errors.last_name}</p>
+                  )}
                 </div>
               </div>
               <div className="mt-8">
@@ -98,6 +154,9 @@ export default function RegisterPage() {
                     className="w-full border-b border-gray-300 px-2 py-3 text-sm outline-none focus:border-[#333]"
                     placeholder="johnsmith@example.com"
                   />
+                  {errors.email && (
+                    <p className="text-xs text-red-500">{errors.email}</p>
+                  )}
                 </div>
               </div>
               <div className="mt-8">
@@ -120,6 +179,9 @@ export default function RegisterPage() {
                     className="absolute right-2 h-[18px] w-[18px] cursor-pointer"
                     viewBox="0 0 128 128"
                   ></svg>
+                  {errors.password && (
+                    <p className="text-xs text-red-500">{errors.password}</p>
+                  )}
                 </div>
               </div>
               <div className="mt-8">
@@ -142,6 +204,11 @@ export default function RegisterPage() {
                     className="absolute right-2 h-[18px] w-[18px] cursor-pointer"
                     viewBox="0 0 128 128"
                   ></svg>
+                  {errors.confirmPassword && (
+                    <p className="text-xs text-red-500">
+                      {errors.confirmPassword}
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="mt-12">
@@ -149,7 +216,7 @@ export default function RegisterPage() {
                   type="submit"
                   className="w-full rounded-full bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-xl hover:bg-blue-700 focus:outline-none"
                 >
-                  Register
+                  {loading ? "Registering..." : "Register"}
                 </button>
               </div>
             </form>

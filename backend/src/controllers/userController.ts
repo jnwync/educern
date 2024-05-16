@@ -52,3 +52,29 @@ export const deleteUser = async (req: Request, res: Response) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+
+export const loginUser = async (req: Request, res: Response) => {
+  try {
+    const {email, password} = req.body
+    await userService.loginUserService(email, password)
+    res.status(204).send();
+    console.log('Login successful')
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const getUserByEmail = async (req: Request, res: Response) => {
+  try {
+    const email = req.params.email
+    const user = await userService.getUserByEmail(email)
+    if (user) {
+      res.json(user);
+    } else {
+      res.status(404).json({ error: "User not found" });
+    }
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};

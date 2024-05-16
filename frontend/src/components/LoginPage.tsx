@@ -18,6 +18,7 @@ function LoginPage() {
       })
       .then((response) => {
         console.log(response.data);
+        console.log('Login successful!')
       })
       .catch((error) => {
         console.error("Error logging in:", error);

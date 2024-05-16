@@ -64,10 +64,10 @@ export default function RegisterPage() {
   const validateForm = () => {
     let formErrors: Partial<FormData> = {};
 
-    if (!/^[A-Za-z]+$/.test(formData.first_name)) {
+    if (!/^[A-Za-z\s]+$/.test(formData.first_name)) {
       formErrors.first_name = "First name should contain only letters.";
     }
-    if (!/^[A-Za-z]+$/.test(formData.last_name)) {
+    if (!/^[A-Za-z\s]+$/.test(formData.last_name)) {
       formErrors.last_name = "Last name should contain only letters.";
     }
 

@@ -26,3 +26,20 @@ export const updateUserService = async (id: number, data: any) => {
 export const deleteUserService = async (id: number) => {
   return userDao.deleteUser(id);
 };
+
+export const loginUserService = async (email: string, password: string) => {
+  const user = await userDao.getUserByEmail(email)
+  if (!user) {
+    throw new Error('User details are incorrect')
+  }
+  const passwordCompare = await bcrypt.compare(password, user.password)
+  if (!passwordCompare) {
+    throw new Error('Incorrect Password')
+  }
+    return user
+}
+
+export const getUserByEmail = async (email: string) => {
+  return await userDao.getUserByEmail(email)
+
+}

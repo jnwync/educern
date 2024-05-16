@@ -28,3 +28,16 @@ export const deleteUser = async (id: number) => {
     where: { user_id: id },
   });
 };
+
+export const loginUser = async (email: string, password: string) => {
+  return prisma.user.findUnique({
+    where: {
+      email: email,
+      password: password
+    }
+  })
+}
+
+export const getUserByEmail = async (email: string) => {
+  return prisma.user.findUnique({ where: { email } });
+};

@@ -66,7 +66,7 @@ const NewsFeed = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-xl">
+      <div className="w-full max-w-3xl">
         {showCreateForm && (
           <PostForm onPostCreated={handlePostCreated} onClose={handleCloseForm} />
         )}
@@ -76,11 +76,13 @@ const NewsFeed = () => {
         >
           Create New Post
         </button>
-        {Array.isArray(posts) && posts.length > 0 ? (
-          posts.map((post) => <Post key={post.post_id} post={post} />)
-        ) : (
-          <p className="text-center">No posts available.</p>
-        )}
+        <div className="h-[600px] overflow-y-auto">
+          {Array.isArray(posts) && posts.length > 0 ? (
+            posts.map((post) => <Post key={post.post_id} post={post} />)
+          ) : (
+            <p className="text-center">No posts available.</p>
+          )}
+        </div>
       </div>
     </div>
   );

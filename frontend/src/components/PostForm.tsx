@@ -64,7 +64,7 @@ const PostForm: React.FC<PostFormProps> = ({ onPostCreated, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="relative w-full max-w-md p-8 bg-white rounded-lg shadow-md">
+      <div className="relative w-full max-w-md p-8 bg-white rounded-lg shadow-md bg-stone-900 text-white">
         <button
           onClick={handleCancel}
           className="absolute text-gray-500 top-2 right-2 hover:text-gray-700"
@@ -92,14 +92,14 @@ const PostForm: React.FC<PostFormProps> = ({ onPostCreated, onClose }) => {
               placeholder="Caption"
               value={caption}
               onChange={handleCaptionChange}
-              className="w-full p-3 border rounded"
+              className="w-full p-3 border rounded bg-transparent"
               maxLength={20}
               required
             />
           </div>
           <div className="mb-4">
             <textarea
-              className="w-full p-3 border rounded"
+              className="w-full p-3 border rounded bg-transparent"
               placeholder="Write your post..."
               value={content}
               onChange={handleContentChange}

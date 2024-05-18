@@ -98,9 +98,9 @@ export default function RegisterPage() {
       exit={{ opacity: 0, x: 100 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="font-sans text-[#333]">
+      <div className="font-sans text-white bg-stone-800">
         <div className="flex flex-col items-center justify-center min-h-screen">
-          <div className="m-4 grid w-full max-w-6xl items-center gap-4 rounded-md p-4 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.3)] md:grid-cols-2">
+          <div className="m-4 grid w-full max-w-6xl items-center gap-4 rounded-md p-4 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.3)] md:grid-cols-2 bg-stone-900">
             <div
               className="p-8 bg-blue-600 rounded-xl max-md:mt-10 md:h-full lg:p-12"
               style={{
@@ -134,7 +134,7 @@ export default function RegisterPage() {
                       value={formData.first_name}
                       onChange={handleChange}
                       required
-                      className="w-full border-b border-gray-300 px-2 py-3 text-sm outline-none focus:border-[#333]"
+                      className="w-full border-b border-gray-300 px-2 py-3 text-sm outline-none focus:border-[#333] bg-transparent"
                       placeholder="John"
                     />
                     {errors.first_name && (
@@ -153,7 +153,7 @@ export default function RegisterPage() {
                       value={formData.last_name}
                       onChange={handleChange}
                       required
-                      className="w-full border-b border-gray-300 px-2 py-3 text-sm outline-none focus:border-[#333]"
+                      className="w-full border-b border-gray-300 px-2 py-3 text-sm outline-none focus:border-[#333] bg-transparent"
                       placeholder="Smith"
                     />
                     {errors.last_name && (
@@ -170,7 +170,7 @@ export default function RegisterPage() {
                       value={formData.email}
                       onChange={handleChange}
                       required
-                      className="w-full border-b border-gray-300 px-2 py-3 text-sm outline-none focus:border-[#333]"
+                      className="w-full border-b border-gray-300 px-2 py-3 text-sm outline-none focus:border-[#333] bg-transparent"
                       placeholder="johnsmith@example.com"
                     />
                     {errors.email && (
@@ -187,7 +187,7 @@ export default function RegisterPage() {
                       value={formData.password}
                       onChange={handleChange}
                       required
-                      className="w-full border-b border-gray-300 px-2 py-3 text-sm outline-none focus:border-[#333]"
+                      className="w-full border-b border-gray-300 px-2 py-3 text-sm outline-none focus:border-[#333] bg-transparent"
                       placeholder="************"
                     />
                     <svg
@@ -212,7 +212,7 @@ export default function RegisterPage() {
                       value={formData.confirmPassword}
                       onChange={handleChange}
                       required
-                      className="w-full border-b border-gray-300 px-2 py-3 text-sm outline-none focus:border-[#333]"
+                      className="w-full border-b border-gray-300 px-2 py-3 text-sm outline-none focus:border-[#333] bg-transparent"
                       placeholder="************"
                     />
                     <svg

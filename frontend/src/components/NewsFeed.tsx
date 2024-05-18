@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Post, { PostType } from "./Post";
 import PostForm from "./PostForm";
+import Navbar from "./Navbar";
 
 const NewsFeed = () => {
   const [posts, setPosts] = useState<PostType[]>([
@@ -65,23 +66,26 @@ const NewsFeed = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-3xl">
-        {showCreateForm && (
-          <PostForm onPostCreated={handlePostCreated} onClose={handleCloseForm} />
-        )}
-        <button
-          className="w-full px-4 py-2 mb-4 text-white bg-blue-500 rounded hover:bg-blue-600"
-          onClick={() => setShowCreateForm(true)}
-        >
-          Create New Post
-        </button>
-        <div className="h-[600px] overflow-y-auto">
-          {Array.isArray(posts) && posts.length > 0 ? (
-            posts.map((post) => <Post key={post.post_id} post={post} />)
-          ) : (
-            <p className="text-center">No posts available.</p>
+    <div className="min-h-screen bg-stone-800">
+      <Navbar />
+      <div className="flex items-center justify-center min-h-screen bg-stone-800">
+        <div className="w-full max-w-3xl">
+          {showCreateForm && (
+            <PostForm onPostCreated={handlePostCreated} onClose={handleCloseForm} />
           )}
+          <button
+            className="w-full px-4 py-2 mb-4 text-white bg-blue-500 rounded hover:bg-blue-600"
+            onClick={() => setShowCreateForm(true)}
+          >
+            Create New Post
+          </button>
+          <div className="h-[600px] overflow-y-auto">
+            {Array.isArray(posts) && posts.length > 0 ? (
+              posts.map((post) => <Post key={post.post_id} post={post} />)
+            ) : (
+              <p className="text-center">No posts available.</p>
+            )}
+          </div>
         </div>
       </div>
     </div>

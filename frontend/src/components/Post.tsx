@@ -27,7 +27,7 @@ interface PostProps {
 
 const Post: React.FC<PostProps> = ({ post }) => {
   return (
-    <div className="p-4 mb-4 bg-white border rounded-lg shadow-md">
+    <div className="p-4 mb-4 bg-stone-900 border-stone-950 rounded-lg shadow-md text-white">
       <h2 className="text-xl font-bold">
         {post.user.first_name} {post.user.last_name}
       </h2>

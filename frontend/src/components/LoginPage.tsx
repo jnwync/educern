@@ -36,9 +36,9 @@ function LoginPage() {
       exit={{ opacity: 0, x: -100 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="font-sans text-[#333]">
+      <div className="font-sans text-white bg-stone-800">
         <div className="flex flex-col items-center justify-center min-h-screen">
-          <div className="m-4 grid w-full max-w-6xl items-center gap-4 rounded-md p-4 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.3)] md:grid-cols-2">
+          <div className="m-4 grid w-full max-w-6xl items-center gap-4 rounded-md p-4 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.3)] md:grid-cols-2 bg-stone-900">
             <div className="w-full py-4 sm:px-6 md:max-w-md">
               <form>
                 <div className="mb-12">
@@ -62,7 +62,7 @@ function LoginPage() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="w-full border-b border-gray-300 px-2 py-3 text-sm outline-none focus:border-[#333]"
+                      className="w-full border-b border-gray-300 px-2 py-3 text-sm outline-none focus:border-[#333] bg-transparent"
                       placeholder="example@educern.com"
                     />
                     <svg
@@ -108,7 +108,7 @@ function LoginPage() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      className="w-full border-b border-gray-300 px-2 py-3 text-sm outline-none focus:border-[#333]"
+                      className="w-full border-b border-gray-300 px-2 py-3 text-sm outline-none focus:border-[#333] bg-transparent"
                       placeholder="iloveeducern"
                     />
                     <svg

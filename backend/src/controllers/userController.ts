@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import * as userService from "../services/userService";
+import { jwtGenerator } from "../utils/jwtGenerator"
 
 export const getAllUsers = async (req: Request, res: Response) => {
   try {
@@ -53,13 +54,17 @@ export const deleteUser = async (req: Request, res: Response) => {
   }
 };
 
-
 export const loginUser = async (req: Request, res: Response) => {
   try {
-    const {email, password} = req.body
-    await userService.loginUserService(email, password)
-    res.status(204).send();
-    console.log('Login successful')
+    const { email, password } = req.body;
+    const user = await userService.loginUserService(email, password);
+
+    const token = jwtGenerator(user.user_id)
+    res.json({token})
+    console.log(token)
+    if (!token) {
+      throw new Error('Token does not exist.')
+    }
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
@@ -67,8 +72,8 @@ export const loginUser = async (req: Request, res: Response) => {
 
 export const getUserByEmail = async (req: Request, res: Response) => {
   try {
-    const email = req.params.email
-    const user = await userService.getUserByEmail(email)
+    const email = req.params.email;
+    const user = await userService.getUserByEmail(email);
     if (user) {
       res.json(user);
     } else {

@@ -1,28 +1,33 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate()
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async(e: React.FormEvent) => {
     console.log("THIS IS THE EMAIL AND PASSWORD:", email, password);
     e.preventDefault();
-    axios
+    try {
+      const response = await axios
       .post("http://localhost:3000/users/login", {
         email: email,
         password: password,
       })
-      .then((response) => {
-        console.log(response.data);
-        console.log('Login successful!')
-      })
-      .catch((error) => {
-        console.error("Error logging in:", error);
-      });
+      const token = response.data.token
+      localStorage.setItem("Token", token)
+
+      navigate('/newsfeed')
+
+      console.log(token)
+    } catch (error) {
+      console.error(error)
+    }
+    
   };
 
   const togglePasswordVisibility = () => {

@@ -60,7 +60,9 @@ export const loginUser = async (req: Request, res: Response) => {
     const user = await userService.loginUserService(email, password);
 
     const token = jwtGenerator(user.user_id)
-    res.json({token})
+    const user_id = user.user_id
+    res.json({token, user_id}
+    )
     console.log(token)
     if (!token) {
       throw new Error('Token does not exist.')

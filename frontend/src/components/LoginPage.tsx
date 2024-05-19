@@ -19,11 +19,14 @@ function LoginPage() {
         password: password,
       })
       const token = response.data.token
+      const user_id = response.data.user_id
       localStorage.setItem("Token", token)
+      localStorage.setItem("user_id", user_id)
 
       navigate('/newsfeed')
 
       console.log(token)
+      console.log(user_id)
     } catch (error) {
       console.error(error)
     }

@@ -27,7 +27,12 @@ export const getPostById = async (req: Request, res: Response) => {
 
 export const createPost = async (req: Request, res: Response) => {
   try {
-    const newPost = await postService.createPostService(req.body);
+    const postData = {
+      ...req.body,
+      imageUrl: req.file ? `/uploads/${req.file.filename}` : null, 
+    };
+
+    const newPost = await postService.createPostService(postData);
     res.status(201).json(newPost);
   } catch (error: any) {
     console.error("Error creating post:", error);

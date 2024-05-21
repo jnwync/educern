@@ -4,7 +4,7 @@ import { PostType } from "./Post";
 
 interface PostFormProps {
   onPostCreated: (newPost: PostType) => void;
-  onClose: () => void; 
+  onClose: () => void;
 }
 
 const PostForm: React.FC<PostFormProps> = ({ onPostCreated, onClose }) => {
@@ -41,30 +41,55 @@ const PostForm: React.FC<PostFormProps> = ({ onPostCreated, onClose }) => {
       formData.append("image", image);
     }
 
+    const userId = localStorage.getItem("user_id");
+    if (userId) {
+      formData.append("user_id", userId);
+    } else {
+      console.error("User ID not found in local storage");
+    }
+
+    console.log("Form Data:");
+    formData.forEach((value, key) => {
+      console.log(key, value);
+    });
+
     try {
-      const response = await axios.post("/api/posts", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const response = await axios.post(
+        "http://localhost:3000/posts/",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
       onPostCreated(response.data);
       setCaption("");
       setContent("");
       setImage(null);
       onClose();
-    } catch (error) {
-      console.error("Error creating post", error);
+    } catch (error: any) {
+      if (error.response) {
+        console.error("Error response data:", error.response.data);
+        console.error("Error response status:", error.response.status);
+        console.error("Error response headers:", error.response.headers);
+      } else if (error.request) {
+        console.error("Error request:", error.request);
+      } else {
+        console.error("Error message:", error.message);
+      }
+      console.error("Error config:", error.config);
     }
   };
 
   const handleCancel = () => {
-    onClose(); 
+    onClose();
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="relative w-full max-w-md p-8 bg-white rounded-lg shadow-md bg-stone-900 text-white">
+      <div className="relative w-full max-w-md p-8 text-white rounded-lg shadow-md bg-stone-900">
         <button
           onClick={handleCancel}
           className="absolute text-gray-500 top-2 right-2 hover:text-gray-700"
@@ -84,7 +109,9 @@ const PostForm: React.FC<PostFormProps> = ({ onPostCreated, onClose }) => {
             />
           </svg>
         </button>
-        <h2 className="mb-4 text-xl font-semibold">Create a New Post</h2>
+        <h2 className="mb-4 text-xl font-semibold text-white">
+          Create a New Post
+        </h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <input
@@ -92,14 +119,14 @@ const PostForm: React.FC<PostFormProps> = ({ onPostCreated, onClose }) => {
               placeholder="Caption"
               value={caption}
               onChange={handleCaptionChange}
-              className="w-full p-3 border rounded bg-transparent"
+              className="w-full p-3 bg-transparent border rounded"
               maxLength={20}
               required
             />
           </div>
           <div className="mb-4">
             <textarea
-              className="w-full p-3 border rounded bg-transparent"
+              className="w-full p-3 bg-transparent border rounded"
               placeholder="Write your post..."
               value={content}
               onChange={handleContentChange}

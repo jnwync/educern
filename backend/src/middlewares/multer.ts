@@ -1,33 +1,30 @@
-import express from "express";
 import multer from "multer";
 import path from "path";
-import { createNewPost } from "../controllers/postController";
-
-const router = express.Router();
 
 const storage = multer.diskStorage({
-  destination: (req: any, file: any, cb: any) => {
-    cb(null, "/backend/src/images");
+  destination: (req, file, cb) => {
+    cb(null, "../images");
   },
-  filename: (req: any, file: any, cb: any) => {
-    cb(null, `${Date.now()}-${file.originalname}`);
+  filename: (req, file, cb) => {
+    cb(
+      null,
+      `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`
+    );
   },
 });
-
-const fileFilter = (req: any, file: any, cb: any) => {
-  if (file.mimetype.startsWith("image/")) {
-    cb(null, true);
-  } else {
-    cb(new Error("Not an image! Please upload an image."), false);
-  }
-};
 
 export const upload = multer({
   storage: storage,
-  fileFilter: fileFilter,
-  limits: { files: 3 },
+  limits: {
+    fileSize: 1024 * 1024 * 5,
+  },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith("image/")) {
+      cb(null, true);
+    } else {
+      cb(new Error("Only images are allowed!"));
+    }
+  },
 });
 
-router.post("/posts", upload.array("images"), createNewPost);
-
-export default router;
+export default upload;

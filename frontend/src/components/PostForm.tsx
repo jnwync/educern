@@ -11,28 +11,6 @@ const PostForm: React.FC<PostFormProps> = ({ onPostCreated, onClose }) => {
   const [content, setContent] = useState("");
   const [images, setImages] = useState<File[]>([]);
 
-  const handleCaptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.value.length <= 20) {
-      setCaption(e.target.value);
-    }
-  };
-
-  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    if (e.target.value.length <= 300) {
-      setContent(e.target.value);
-    }
-  };
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files && files.length > 0) {
-      const selectedImages = Array.from(files).filter((file) =>
-        file.type.startsWith("image/")
-      );
-      setImages(selectedImages);
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -49,6 +27,7 @@ const PostForm: React.FC<PostFormProps> = ({ onPostCreated, onClose }) => {
       formData.append("user_id", userId);
     } else {
       console.error("User ID not found in local storage");
+      return;
     }
 
     try {
@@ -67,20 +46,16 @@ const PostForm: React.FC<PostFormProps> = ({ onPostCreated, onClose }) => {
       setContent("");
       setImages([]);
       onClose();
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error creating post:", error);
     }
-  };
-
-  const handleCancel = () => {
-    onClose();
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="relative w-full max-w-md p-8 text-white rounded-lg shadow-md bg-stone-900">
         <button
-          onClick={handleCancel}
+          onClick={onClose}
           className="absolute text-gray-500 top-2 right-2 hover:text-gray-700"
         >
           <svg
@@ -107,7 +82,7 @@ const PostForm: React.FC<PostFormProps> = ({ onPostCreated, onClose }) => {
               type="text"
               placeholder="Caption"
               value={caption}
-              onChange={handleCaptionChange}
+              onChange={(e) => setCaption(e.target.value)}
               className="w-full p-3 bg-transparent border rounded"
               maxLength={20}
               required
@@ -118,7 +93,7 @@ const PostForm: React.FC<PostFormProps> = ({ onPostCreated, onClose }) => {
               className="w-full p-3 bg-transparent border rounded"
               placeholder="Write your post..."
               value={content}
-              onChange={handleContentChange}
+              onChange={(e) => setContent(e.target.value)}
               maxLength={300}
               required
             />
@@ -127,7 +102,7 @@ const PostForm: React.FC<PostFormProps> = ({ onPostCreated, onClose }) => {
             <input
               type="file"
               accept="image/*"
-              onChange={handleImageChange}
+              onChange={(e) => setImages(Array.from(e.target.files || []))}
               className="w-full p-3 border rounded"
               multiple
             />

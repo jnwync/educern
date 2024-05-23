@@ -27,9 +27,14 @@ export const getPostById = async (req: Request, res: Response) => {
 
 export const createPost = async (req: Request, res: Response) => {
   try {
+    const { caption, content, user_id } = req.body;
+    const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
+
     const postData = {
-      ...req.body,
-      imageUrl: req.file ? `/uploads/${req.file.filename}` : null,
+      caption,
+      content,
+      user_id,
+      imageUrl,
     };
 
     const newPost = await postService.createPostService(postData);
@@ -60,5 +65,31 @@ export const deletePost = async (req: Request, res: Response) => {
   } catch (error: any) {
     console.error(`Error deleting post with ID ${req.params.id}:`, error);
     res.status(500).json({ error: error.message });
+  }
+};
+
+export const createNewPost = async (req: Request, res: Response) => {
+  try {
+    const { caption, content, user_id } = req.body;
+
+    if (!req.files || !("images" in req.files)) {
+      return res.status(400).json({ error: "No images uploaded." });
+    }
+
+    const images = (req.files["images"] as Express.Multer.File[]).map(
+      (image: any) => image.path
+    );
+
+    const newPost = await postService.createPostService({
+      caption,
+      content,
+      user_id,
+      images,
+    });
+
+    res.status(201).json(newPost);
+  } catch (error) {
+    console.error("Error creating post:", error);
+    res.status(500).json({ error: "Error creating post" });
   }
 };

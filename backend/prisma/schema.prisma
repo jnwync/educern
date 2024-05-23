@@ -43,7 +43,7 @@ model Post {
   post_id    Int       @id @default(autoincrement())
   caption    String
   content    String
-  image      String?
+  image      String[]
   votes      Int?
   created_at DateTime  @default(now())
   deleted_at DateTime?

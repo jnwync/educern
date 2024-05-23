@@ -12,7 +12,12 @@ export const getPostById = async (id: number) => {
 
 export const createPost = async (data: any) => {
   return prisma.post.create({
-    data,
+    data: {
+      caption: data.caption,
+      content: data.content,
+      image: data.image,
+      user_id: data.user_id,
+    },
   });
 };
 

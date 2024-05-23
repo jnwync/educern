@@ -1,5 +1,9 @@
+import express from "express";
 import multer from "multer";
 import path from "path";
+import { createNewPost } from "../controllers/postController";
+
+const router = express.Router();
 
 const storage = multer.diskStorage({
   destination: (req: any, file: any, cb: any) => {
@@ -23,3 +27,7 @@ export const upload = multer({
   fileFilter: fileFilter,
   limits: { files: 3 },
 });
+
+router.post("/posts", upload.array("images"), createNewPost);
+
+export default router;

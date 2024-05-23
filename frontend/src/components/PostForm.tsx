@@ -1,16 +1,15 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { PostType } from "./Post";
 
 interface PostFormProps {
-  onPostCreated: (newPost: PostType) => void;
+  onPostCreated: (newPost: any) => void;
   onClose: () => void;
 }
 
 const PostForm: React.FC<PostFormProps> = ({ onPostCreated, onClose }) => {
   const [caption, setCaption] = useState("");
   const [content, setContent] = useState("");
-  const [image, setImage] = useState<File | null>(null);
+  const [images, setImages] = useState<File[]>([]);
 
   const handleCaptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value.length <= 20) {
@@ -27,7 +26,10 @@ const PostForm: React.FC<PostFormProps> = ({ onPostCreated, onClose }) => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
-      setImage(files[0]);
+      const selectedImages = Array.from(files).filter((file) =>
+        file.type.startsWith("image/")
+      );
+      setImages(selectedImages);
     }
   };
 
@@ -37,8 +39,9 @@ const PostForm: React.FC<PostFormProps> = ({ onPostCreated, onClose }) => {
     const formData = new FormData();
     formData.append("caption", caption);
     formData.append("content", content);
-    if (image) {
-      formData.append("image", image);
+
+    for (let i = 0; i < images.length; i++) {
+      formData.append("images", images[i]);
     }
 
     const userId = localStorage.getItem("user_id");
@@ -47,11 +50,6 @@ const PostForm: React.FC<PostFormProps> = ({ onPostCreated, onClose }) => {
     } else {
       console.error("User ID not found in local storage");
     }
-
-    console.log("Form Data:");
-    formData.forEach((value, key) => {
-      console.log(key, value);
-    });
 
     try {
       const response = await axios.post(
@@ -67,19 +65,10 @@ const PostForm: React.FC<PostFormProps> = ({ onPostCreated, onClose }) => {
       onPostCreated(response.data);
       setCaption("");
       setContent("");
-      setImage(null);
+      setImages([]);
       onClose();
     } catch (error: any) {
-      if (error.response) {
-        console.error("Error response data:", error.response.data);
-        console.error("Error response status:", error.response.status);
-        console.error("Error response headers:", error.response.headers);
-      } else if (error.request) {
-        console.error("Error request:", error.request);
-      } else {
-        console.error("Error message:", error.message);
-      }
-      console.error("Error config:", error.config);
+      console.error("Error creating post:", error);
     }
   };
 
@@ -140,6 +129,7 @@ const PostForm: React.FC<PostFormProps> = ({ onPostCreated, onClose }) => {
               accept="image/*"
               onChange={handleImageChange}
               className="w-full p-3 border rounded"
+              multiple
             />
           </div>
           <div className="flex justify-end">

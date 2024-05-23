@@ -29,7 +29,7 @@ export const createPost = async (req: Request, res: Response) => {
   try {
     const postData = {
       ...req.body,
-      imageUrl: req.file ? `/uploads/${req.file.filename}` : null, 
+      imageUrl: req.file ? `/uploads/${req.file.filename}` : null,
     };
 
     const newPost = await postService.createPostService(postData);

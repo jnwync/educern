@@ -23,7 +23,7 @@ export const createPost = async (
   content: string,
   user_id: number,
   images: string[]
-): Promise<Post> => {
+) => {
   const post = await prisma.post.create({
     data: {
       caption,

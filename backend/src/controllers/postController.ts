@@ -13,7 +13,8 @@ export const getAllPosts = async (req: Request, res: Response) => {
 
 export const getPostById = async (req: Request, res: Response) => {
   try {
-    const post = await postService.getPostByIdService(Number(req.params.id));
+    const postId = Number(req.params.id);
+    const post = await postService.getPostByIdService(postId);
     if (post) {
       res.json(post);
     } else {
@@ -27,10 +28,8 @@ export const getPostById = async (req: Request, res: Response) => {
 
 export const updatePost = async (req: Request, res: Response) => {
   try {
-    const updatedPost = await postService.updatePostService(
-      Number(req.params.id),
-      req.body
-    );
+    const postId = Number(req.params.id);
+    const updatedPost = await postService.updatePostService(postId, req.body);
     res.json(updatedPost);
   } catch (error: any) {
     console.error(`Error updating post with ID ${req.params.id}:`, error);
@@ -40,7 +39,8 @@ export const updatePost = async (req: Request, res: Response) => {
 
 export const deletePost = async (req: Request, res: Response) => {
   try {
-    await postService.deletePostService(Number(req.params.id));
+    const postId = Number(req.params.id);
+    await postService.deletePostService(postId);
     res.status(204).send();
   } catch (error: any) {
     console.error(`Error deleting post with ID ${req.params.id}:`, error);
@@ -49,22 +49,27 @@ export const deletePost = async (req: Request, res: Response) => {
 };
 
 export const createPost = async (req: Request, res: Response) => {
-  const { caption, content, user_id } = req.body;
+  const { caption, content } = req.body;
   const images = req.files
-    ? (req.files as Express.Multer.File[]).map((file) => file.filename)
+    ? (req.files as Express.Multer.File[]).map((file) => file.path)
     : [];
+  const user_id = req.body.user_id ? Number(req.body.user_id) : undefined; 
 
   try {
-    const post = await postService.createPostService(
+    if (!user_id) {
+      return res.status(400).json({ error: "user_id is required" });
+    }
+
+    const newPost = await postService.createPostService(
       caption,
       content,
       user_id,
       images
     );
-    res.status(201).json(post);
+    res.status(201).json(newPost);
   } catch (error) {
     console.error("Error creating post:", error);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "Error creating post" });
   }
 };
 
@@ -83,7 +88,7 @@ export const createNewPost = async (req: Request, res: Response) => {
     const newPost = await postService.createPostService(
       caption,
       content,
-      user_id,
+      Number(user_id),
       images
     );
 

@@ -7,9 +7,8 @@ const router = express.Router();
 
 router.get("/", authenticateJWT, postController.getAllPosts);
 router.get("/:id", authenticateJWT, postController.getPostById);
-router.post("/", postController.createPost);
+router.post("/", upload.array("images", 3), postController.createPost);
 router.put("/:id", authenticateJWT, postController.updatePost);
 router.delete("/:id", authenticateJWT, postController.deletePost);
-router.post("/posts", upload.array("images", 3), postController.createPost);
 
 export default router;

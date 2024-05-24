@@ -1,5 +1,13 @@
 import prisma from "../prismaClient";
 
+interface Post {
+  post_id: number;
+  caption: string;
+  content: string;
+  images: string[];
+  user_id: number;
+}
+
 export const getAllPosts = async () => {
   return prisma.post.findMany();
 };
@@ -15,7 +23,7 @@ export const createPost = async (
   content: string,
   user_id: number,
   images: string[]
-) => {
+): Promise<Post> => {
   const post = await prisma.post.create({
     data: {
       caption,

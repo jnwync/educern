@@ -1,30 +1,23 @@
 import multer from "multer";
 import path from "path";
+import { generateUniqueFilename } from "../controllers/imageController";
 
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "../images");
+  destination: function (req, file, cb) {
+    cb(null, path.join(__dirname, "../images"));
   },
-  filename: (req, file, cb) => {
+  filename: function (req, file, cb) {
+    const userEmail = req.query.userEmail as string;
+
+    const uniqueFilename = generateUniqueFilename(file.originalname, userEmail);
+
     cb(
       null,
-      `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`
+      file.fieldname + "-" + uniqueFilename + path.extname(file.originalname)
     );
   },
 });
 
-export const upload = multer({
-  storage: storage,
-  limits: {
-    fileSize: 1024 * 1024 * 5,
-  },
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith("image/")) {
-      cb(null, true);
-    } else {
-      cb(new Error("Only images are allowed!"));
-    }
-  },
-});
+const upload = multer({ storage: storage });
 
-export default upload;
+export { upload };

@@ -51,3 +51,10 @@ model Post {
   user_id    Int
   Comment    Comment[]
 }
+
+model File {
+  id           Int      @id @default(autoincrement())
+  originalname String
+  filename     String
+  user_id      Int
+}

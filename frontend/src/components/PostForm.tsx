@@ -22,13 +22,14 @@ const PostForm: React.FC<PostFormProps> = ({ onPostCreated, onClose }) => {
       formData.append("images", images[i]);
     }
 
-    const userId = localStorage.getItem("user_id");
-    if (userId) {
-      formData.append("user_id", userId);
-    } else {
+    const user_id = localStorage.getItem("user_id");
+
+    if (!user_id) {
       console.error("User ID not found in local storage");
       return;
     }
+
+    formData.append("user_id", user_id);
 
     try {
       const response = await axios.post(

@@ -8,8 +8,14 @@ export const getPostByIdService = async (id: number) => {
   return postDao.getPostById(id);
 };
 
-export const createPostService = async (data: any) => {
-  return postDao.createPost(data);
+export const createPostService = async (
+  caption: string,
+  content: string,
+  user_id: number,
+  images: string[]
+) => {
+  const post = await postDao.createPost(caption, content, user_id, images);
+  return post;
 };
 
 export const updatePostService = async (id: number, data: any) => {

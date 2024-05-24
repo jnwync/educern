@@ -1,5 +1,13 @@
 import prisma from "../prismaClient";
 
+interface Post {
+  post_id: number;
+  caption: string;
+  content: string;
+  images: string[];
+  user_id: number;
+}
+
 export const getAllPosts = async () => {
   return prisma.post.findMany();
 };
@@ -10,10 +18,21 @@ export const getPostById = async (id: number) => {
   });
 };
 
-export const createPost = async (data: any) => {
-  return prisma.post.create({
-    data,
+export const createPost = async (
+  caption: string,
+  content: string,
+  user_id: number,
+  images: string[]
+) => {
+  const post = await prisma.post.create({
+    data: {
+      caption,
+      content,
+      user_id,
+      images: { set: images },
+    },
   });
+  return post;
 };
 
 export const updatePost = async (id: number, data: any) => {

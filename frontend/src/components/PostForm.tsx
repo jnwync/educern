@@ -51,6 +51,12 @@ const PostForm: React.FC<PostFormProps> = ({ onPostCreated, onClose }) => {
     }
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setImages(Array.from(e.target.files));
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="relative w-full max-w-md p-8 text-white rounded-lg shadow-md bg-stone-900">
@@ -102,7 +108,7 @@ const PostForm: React.FC<PostFormProps> = ({ onPostCreated, onClose }) => {
             <input
               type="file"
               accept="image/*"
-              onChange={(e) => setImages(Array.from(e.target.files || []))}
+              onChange={handleImageChange}
               className="w-full p-3 border rounded"
               multiple
             />

@@ -44,7 +44,7 @@ model Post {
   caption    String
   content    String
   images      String[]
-  votes      Int?
+  votes      Int       @default(0) 
   created_at DateTime  @default(now())
   deleted_at DateTime?
   user       User      @relation(fields: [user_id], references: [user_id])

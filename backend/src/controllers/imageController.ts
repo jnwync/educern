@@ -1,36 +1,31 @@
 import { Request, Response } from "express";
-import multer from "multer";
 import uploadService from "../services/imageService";
 
 interface MulterRequest extends Request {
   file?: Express.Multer.File;
 }
 
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
-
 export function generateUniqueFilename(
   originalname: string,
-  userEmail: string
+  email: string,
+  user_id: number
 ): string {
   const timestamp = new Date().getTime();
-  const uniqueFilename = `file_${timestamp}_${userEmail}`;
-
-  return uniqueFilename;
+  return `file_${timestamp}_${user_id}_${email}.png`;
 }
 
 class ImageController {
   async uploadFile(req: MulterRequest, res: Response): Promise<void> {
     try {
-      const userEmail = req.query.userEmail as string;
-
       if (!req.file) {
         res.status(400).json({ error: "No file uploaded" });
         return;
       }
 
       const { originalname, buffer } = req.file;
-      const filename = generateUniqueFilename(originalname, userEmail);
+      const email = req.query.email as string;
+      const user_id = req.body.user_id ? Number(req.body.user_id) : 0;
+      const filename = generateUniqueFilename(originalname, email, user_id);
 
       const savedFile = await uploadService.uploadFile(
         originalname,

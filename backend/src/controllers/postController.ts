@@ -53,7 +53,7 @@ export const createPost = async (req: Request, res: Response) => {
   const images = req.files
     ? (req.files as Express.Multer.File[]).map((file) => file.path)
     : [];
-  const user_id = req.body.user_id ? Number(req.body.user_id) : undefined; 
+  const user_id = req.body.user_id ? Number(req.body.user_id) : undefined;
 
   try {
     if (!user_id) {

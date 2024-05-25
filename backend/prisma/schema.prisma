@@ -43,11 +43,18 @@ model Post {
   post_id    Int       @id @default(autoincrement())
   caption    String
   content    String
-  image      String?
-  votes      Int
+  images      String[]
+  votes      Int?
   created_at DateTime  @default(now())
   deleted_at DateTime?
   user       User      @relation(fields: [user_id], references: [user_id])
   user_id    Int
   Comment    Comment[]
+}
+
+model File {
+  id           Int      @id @default(autoincrement())
+  originalname String
+  filename     String
+  user_id      Int
 }

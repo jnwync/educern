@@ -1,35 +1,15 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { PostType } from "./Post";
 
 interface PostFormProps {
-  onPostCreated: (newPost: PostType) => void;
-  onClose: () => void; 
+  onPostCreated: (newPost: any) => void;
+  onClose: () => void;
 }
 
 const PostForm: React.FC<PostFormProps> = ({ onPostCreated, onClose }) => {
   const [caption, setCaption] = useState("");
   const [content, setContent] = useState("");
-  const [image, setImage] = useState<File | null>(null);
-
-  const handleCaptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.value.length <= 20) {
-      setCaption(e.target.value);
-    }
-  };
-
-  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    if (e.target.value.length <= 300) {
-      setContent(e.target.value);
-    }
-  };
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files && files.length > 0) {
-      setImage(files[0]);
-    }
-  };
+  const [images, setImages] = useState<File[]>([]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -37,36 +17,52 @@ const PostForm: React.FC<PostFormProps> = ({ onPostCreated, onClose }) => {
     const formData = new FormData();
     formData.append("caption", caption);
     formData.append("content", content);
-    if (image) {
-      formData.append("image", image);
+
+    for (let i = 0; i < images.length; i++) {
+      formData.append("images", images[i]);
     }
 
+    const user_id = localStorage.getItem("user_id");
+
+    if (!user_id) {
+      console.error("User ID not found in local storage");
+      return;
+    }
+
+    formData.append("user_id", user_id);
+
     try {
-      const response = await axios.post("/api/posts", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const response = await axios.post(
+        "http://localhost:3000/posts/",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
       onPostCreated(response.data);
       setCaption("");
       setContent("");
-      setImage(null);
+      setImages([]);
       onClose();
     } catch (error) {
-      console.error("Error creating post", error);
+      console.error("Error creating post:", error);
     }
   };
 
-  const handleCancel = () => {
-    onClose(); 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setImages(Array.from(e.target.files));
+    }
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="relative w-full max-w-md p-8 bg-white rounded-lg shadow-md bg-stone-900 text-white">
+      <div className="relative w-full max-w-md p-8 text-white rounded-lg shadow-md bg-stone-900">
         <button
-          onClick={handleCancel}
+          onClick={onClose}
           className="absolute text-gray-500 top-2 right-2 hover:text-gray-700"
         >
           <svg
@@ -84,25 +80,27 @@ const PostForm: React.FC<PostFormProps> = ({ onPostCreated, onClose }) => {
             />
           </svg>
         </button>
-        <h2 className="mb-4 text-xl font-semibold">Create a New Post</h2>
+        <h2 className="mb-4 text-xl font-semibold text-white">
+          Create a New Post
+        </h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <input
               type="text"
               placeholder="Caption"
               value={caption}
-              onChange={handleCaptionChange}
-              className="w-full p-3 border rounded bg-transparent"
+              onChange={(e) => setCaption(e.target.value)}
+              className="w-full p-3 bg-transparent border rounded"
               maxLength={20}
               required
             />
           </div>
           <div className="mb-4">
             <textarea
-              className="w-full p-3 border rounded bg-transparent"
+              className="w-full p-3 bg-transparent border rounded"
               placeholder="Write your post..."
               value={content}
-              onChange={handleContentChange}
+              onChange={(e) => setContent(e.target.value)}
               maxLength={300}
               required
             />
@@ -113,6 +111,7 @@ const PostForm: React.FC<PostFormProps> = ({ onPostCreated, onClose }) => {
               accept="image/*"
               onChange={handleImageChange}
               className="w-full p-3 border rounded"
+              multiple
             />
           </div>
           <div className="flex justify-end">

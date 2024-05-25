@@ -9,12 +9,19 @@ interface Post {
 }
 
 export const getAllPosts = async () => {
-  return prisma.post.findMany();
+  return prisma.post.findMany({
+    include: {
+      user: true,
+    },
+  });
 };
 
 export const getPostById = async (id: number) => {
   return prisma.post.findUnique({
     where: { post_id: id },
+    include: {
+      user: true,
+    },
   });
 };
 
@@ -39,12 +46,19 @@ export const createPost = async ({
       images,
       votes,
     },
+    include: {
+      user: true,
+    },
   });
 };
+
 export const updatePost = async (id: number, data: any) => {
   return prisma.post.update({
     where: { post_id: id },
     data,
+    include: {
+      user: true,
+    },
   });
 };
 

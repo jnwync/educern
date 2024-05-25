@@ -5,8 +5,8 @@ import { upload } from "../middlewares/multer";
 
 const router = express.Router();
 
-router.get("/", authenticateJWT, postController.getAllPosts);
-router.get("/:id", authenticateJWT, postController.getPostById);
+router.get("/", postController.getAllPosts);
+router.get("/:id", postController.getPostById);
 router.post("/", upload.array("images", 3), postController.createPost);
 router.put("/:id", authenticateJWT, postController.updatePost);
 router.delete("/:id", authenticateJWT, postController.deletePost);

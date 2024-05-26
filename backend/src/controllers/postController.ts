@@ -37,6 +37,15 @@ export const updatePost = async (req: Request, res: Response) => {
   }
 };
 
+export const upvotePost = async (req: Request, res: Response) => {
+  try {
+    const postId = Number(req.params.id);
+    const updatedPost = await postService.upvotePostService(postId);
+  } catch (error) {
+    console.error(`Error upvoting post with ID ${req.params.id}`, error)
+  }
+}
+
 export const deletePost = async (req: Request, res: Response) => {
   try {
     const postId = Number(req.params.id);

@@ -40,7 +40,8 @@ export const createPost = async ({
 }) => {
   return prisma.post.create({
     data: {
-      caption,
+  
+    caption,
       content,
       user_id,
       images,
@@ -65,5 +66,16 @@ export const updatePost = async (id: number, data: any) => {
 export const deletePost = async (id: number) => {
   return prisma.post.delete({
     where: { post_id: id },
+  });
+};
+
+export const upvotePost = async (id: number) => {
+  return await prisma.post.update({
+    where: { post_id: id },
+    data: {
+      votes: {
+        increment: 1,
+      }
+    }
   });
 };

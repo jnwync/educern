@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { UserType, CommentType, PostType } from "./NewsFeed";
-  
+
 interface FileType {
   id: number;
   originalname: string;
@@ -9,6 +9,7 @@ interface FileType {
   user_id: number;
   post_id: number;
 }
+
 interface PostProps {
   post: PostType;
 }
@@ -20,34 +21,28 @@ const Post: React.FC<PostProps> = ({ post }) => {
   const [votes, setVotes] = useState<number>(0);
   const [files, setFiles] = useState<FileType[]>([]);
 
-
   useEffect(() => {
     const fetchComments = async () => {
       try {
-        console.log("Fetching comments for post_id: ", post.post_id);
         const response = await axios.get<CommentType[]>(
           `http://localhost:3000/comments/${post.post_id}`
         );
         setComments(response.data);
-        console.log("Array of comments", comments);
-        console.log("Fetched comments: ", response.data);
       } catch (error) {
         console.error("Error fetching comments", error);
       }
     };
     fetchComments();
-    console.log("array of comments", comments);
   }, [post]);
 
   useEffect(() => {
     const fetchUser = async () => {
-
-    if (post.user_id) {
       if (!token) {
         console.error("No token found");
         return;
       }
 
+      if (post.user_id) {
         try {
           const response = await axios.get<UserType>(
             `http://localhost:3000/users/${post.user_id}`
@@ -84,7 +79,7 @@ const Post: React.FC<PostProps> = ({ post }) => {
     fetchUser();
     fetchVotes();
     fetchFiles();
-  }, [post.post_id, post.user_id]);
+  }, [post.post_id, post.user_id, token]);
 
   const handleLikeClick = async () => {
     try {
@@ -94,7 +89,6 @@ const Post: React.FC<PostProps> = ({ post }) => {
       console.error("Error liking post", error);
     }
   };
-
 
   return (
     <div className="p-4 mb-4 text-white rounded-lg shadow-md bg-stone-900 border-stone-950">
@@ -113,17 +107,16 @@ const Post: React.FC<PostProps> = ({ post }) => {
       <h2 className="p-3 text-2xl font-bold">{post.caption}</h2>
       <p>{post.content}</p>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-    {files.map((file) => (
-    <div key={file.id} className="relative">
-      <img
-        src={`../../../backend/src/images/${file.filename}.png`}
-        alt={`${file.filename}`}
-        className="w-full mt-2 rounded-md shadow-md"
-      />
-    </div>
-  ))}
-</div>
-
+        {files.map((file) => (
+          <div key={file.id} className="relative">
+            <img
+              src={`../../../backend/src/images/${file.filename}.png`}
+              alt={`${file.filename}`}
+              className="w-full mt-2 rounded-md shadow-md"
+            />
+          </div>
+        ))}
+      </div>
       <div className="flex items-center p-4">
         <button
           onClick={handleLikeClick}
@@ -142,13 +135,11 @@ const Post: React.FC<PostProps> = ({ post }) => {
           </svg>
           <span>{votes}</span>
         </button>
-
       </div>
       <div className="mt-4">
-
         {comments.map((comment) => (
           <div key={comment.comment_id} className="p-2 mt-2 border-t">
-            <p className="font-bold">
+            <p className="font-semibold">
               {comment.user.first_name} {comment.user.last_name}
             </p>
             <p>{comment.content}</p>

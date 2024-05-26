@@ -1,12 +1,19 @@
 import ImageDAO from "../dao/imageDAO";
 
-const uploadFile = async (
+export const uploadFile = async (
   originalname: string,
   filename: string,
-  buffer: Buffer
+  buffer: Buffer,
+  user_id: number,
+  post_id: number
 ) => {
   try {
-    const savedFile = await ImageDAO.uploadFile(originalname, filename, 1);
+    const savedFile = await ImageDAO.uploadFile(
+      originalname,
+      filename,
+      user_id,
+      post_id
+    );
 
     return savedFile;
   } catch (error) {
@@ -14,6 +21,11 @@ const uploadFile = async (
   }
 };
 
-export default {
-  uploadFile,
+export const getFilesByPostId = async (post_id: number) => {
+  try {
+    const files = await ImageDAO.getFilesByPostId(post_id);
+    return files;
+  } catch (error) {
+    throw new Error("Failed to fetch images by post_id");
+  }
 };

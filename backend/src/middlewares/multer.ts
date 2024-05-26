@@ -6,14 +6,9 @@ export interface MulterRequest extends Request {
   file?: Express.Multer.File;
 }
 
-export function generateUniqueFilename(
-  originalname: string,
-  email: string,
-  user_id: number,
-  post_id: number
-): string {
+export function generateUniqueFilename(originalname: string): string {
   const timestamp = new Date().getTime();
-  return `file_${timestamp}_${user_id}_${post_id}_${email}.png`;
+  return `file_${timestamp}.png`;
 }
 
 const storage = multer.diskStorage({
@@ -21,17 +16,7 @@ const storage = multer.diskStorage({
     cb(null, path.join(__dirname, "../images"));
   },
   filename: function (req, file, cb) {
-    const multerReq = req as MulterRequest;
-    const email = req.query.email as string;
-    const user_id = multerReq.body.user_id ? Number(multerReq.body.user_id) : 0;
-    const post_id = multerReq.body.post_id ? Number(multerReq.body.post_id) : 0;
-
-    const uniqueFilename = generateUniqueFilename(
-      file.originalname,
-      email,
-      user_id,
-      post_id
-    );
+    const uniqueFilename = generateUniqueFilename(file.originalname);
 
     cb(null, uniqueFilename);
   },

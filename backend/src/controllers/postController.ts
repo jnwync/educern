@@ -54,9 +54,9 @@ export const upvotePost = async (req: Request, res: Response) => {
     const postId = Number(req.params.id);
     const updatedPost = await postService.upvotePostService(postId);
   } catch (error) {
-    console.error(`Error upvoting post with ID ${req.params.id}`, error)
+    console.error(`Error upvoting post with ID ${req.params.id}`, error);
   }
-}
+};
 
 export const deletePost = async (req: Request, res: Response) => {
   try {
@@ -70,55 +70,33 @@ export const deletePost = async (req: Request, res: Response) => {
 };
 
 export const createPost = async (req: Request, res: Response) => {
-  const { caption, content } = req.body;
-  let { user_id } = req.body;
+  const { caption, content, user_id } = req.body;
 
   try {
-    user_id = Number(user_id);
-
-    if (!user_id) {
-      return res.status(400).json({ error: "user_id is required" });
+    // Validate user_id
+    const parsedUserId = Number(user_id);
+    if (!parsedUserId || isNaN(parsedUserId)) {
+      return res.status(400).json({ error: "user_id must be a valid number" });
     }
 
-    // Initialize an empty array of type File
-    let images: File[] = [];
-
-    // Create the post first
-    const newPost = await postService.createPostService(
-      caption,
-      content,
-      user_id,
-      images
-    );
+    let images: Partial<File>[] = [];
 
     if (req.files) {
       const files = req.files as Express.Multer.File[];
       images = files.map((file) => ({
         originalname: file.originalname,
         filename: generateUniqueFilename(file.originalname),
-        user_id: user_id,
-        post_id: newPost.post_id,
-        id: 0, // Assuming this is a new file and doesn't have an id yet
+        user_id: parsedUserId,
+        post_id: 0, // Assuming this is a new post and doesn't have an id yet
       }));
-
-      // Upload each file
-      for (const file of files) {
-        await imageService.uploadFile(
-          file.originalname,
-          generateUniqueFilename(file.originalname),
-          file.buffer,
-          user_id,
-          newPost.post_id
-        );
-      }
-
-      // Update the post with the files
-      await postService.updatePostService(newPost.post_id, {
-        File: {
-          create: images,
-        },
-      });
     }
+
+    const newPost = await postService.createPostService(
+      caption,
+      content,
+      parsedUserId, // Ensure user_id is passed to the service function as a number
+      images
+    );
 
     res.status(201).json(newPost);
   } catch (error) {

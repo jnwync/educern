@@ -3,7 +3,7 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export interface File {
-  id: number;
+  id?: number;
   originalname: string;
   filename: string;
   user_id: number;
@@ -29,17 +29,15 @@ class ImageDAO {
     return file;
   }
 
-  async getFilesByPostId(post_id: number): Promise<File[]> {
+  async getFilesByPostId(postId: number): Promise<File[]> {
     const files = await prisma.file.findMany({
-      where: {
-        post_id,
-      },
+      where: { post_id: postId },
     });
 
     return files;
   }
 
-  async deleteFile(file_id: number): Promise<File> {
+  async deleteFile(file_id: number): Promise<File | null> {
     const deletedFile = await prisma.file.delete({
       where: {
         id: file_id,

@@ -1,4 +1,11 @@
-import ImageDAO from "../dao/imageDAO";
+import { Request, Response } from "express";
+import * as imageDAO from "../dao/imageDAO";
+import * as postService from "../services/postService";
+
+export function generateUniqueFilename(originalname: string): string {
+  const timestamp = new Date().getTime();
+  return `file_${timestamp}.png`;
+}
 
 export const uploadFile = async (
   originalname: string,
@@ -8,7 +15,7 @@ export const uploadFile = async (
   post_id: number
 ) => {
   try {
-    const savedFile = await ImageDAO.uploadFile(
+    const savedFile = await imageDAO.uploadFile(
       originalname,
       filename,
       user_id,
@@ -21,11 +28,16 @@ export const uploadFile = async (
   }
 };
 
-export const getFilesByPostId = async (post_id: number) => {
+export const getFilesByPostId = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
-    const files = await ImageDAO.getFilesByPostId(post_id);
-    return files;
+    const post_id = Number(req.params.post_id);
+    const files = await imageDAO.getFilesByPostId(post_id);
+    res.json(files);
   } catch (error) {
-    throw new Error("Failed to fetch images by post_id");
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };

@@ -1,3 +1,4 @@
+
 import { PrismaClient, File } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -14,6 +15,7 @@ export const getAllPostsService = async () => {
   return posts;
 };
 
+
 export const getPostByIdService = async (id: number) => {
   const post = await prisma.post.findUnique({
     where: { post_id: id },
@@ -25,13 +27,16 @@ export const getPostByIdService = async (id: number) => {
   });
 
   return post;
+
 };
 
 export const createPostService = async (
   caption: string,
   content: string,
   user_id: number,
+
   images: Partial<File>[]
+
 ) => {
   const newPost = await prisma.post.create({
     data: {
@@ -40,9 +45,11 @@ export const createPostService = async (
       user_id,
       File: {
         create: images.map((file) => ({
+
           originalname: file.originalname!,
           filename: file.filename!,
           user_id: file.user_id!,
+
         })),
       },
       votes: 0,
@@ -50,6 +57,7 @@ export const createPostService = async (
     include: {
       user: true,
       File: true,
+
       Comment: true,
     },
   });
@@ -152,8 +160,8 @@ export const upvotePostService = async (id: number) => {
       },
     },
   });
-
   return updatedPost;
+
 };
 
 export default prisma;

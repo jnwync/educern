@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.get("/", commentController.getAllComments);
 router.get("/:id", commentController.getCommentById);
-router.post("/", authenticateJWT, commentController.createComment);
+router.post("/", authenticateJWT, commentController.createCommentController);
 router.put("/:id", authenticateJWT, commentController.updateComment);
 router.delete("/:id", authenticateJWT, commentController.deleteComment);
 

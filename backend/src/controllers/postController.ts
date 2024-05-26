@@ -1,16 +1,9 @@
 import { Request, Response } from "express";
 import * as postService from "../services/postService";
-import * as userService from "../services/userService";
 import * as imageService from "../services/imageService";
 import { File } from "../dao/imageDAO";
-
 interface MulterRequest extends Request {
   file?: Express.Multer.File;
-}
-
-export function generateUniqueFilename(originalname: string): string {
-  const timestamp = new Date().getTime();
-  return `file_${timestamp}.png`;
 }
 
 export const getAllPosts = async (req: Request, res: Response) => {
@@ -52,9 +45,11 @@ export const updatePost = async (req: Request, res: Response) => {
 export const upvotePost = async (req: Request, res: Response) => {
   try {
     const postId = Number(req.params.id);
-    const updatedPost = await postService.upvotePostService(postId);
+    await postService.upvotePostService(postId);
+    res.status(200).send();
   } catch (error) {
     console.error(`Error upvoting post with ID ${req.params.id}`, error);
+    res.status(500).json({ error: "Error upvoting post" });
   }
 };
 
@@ -85,16 +80,19 @@ export const createPost = async (req: Request, res: Response) => {
       const files = req.files as Express.Multer.File[];
       images = files.map((file) => ({
         originalname: file.originalname,
+
         filename: generateUniqueFilename(file.originalname),
         user_id: parsedUserId,
-        post_id: 0, // Assuming this is a new post and doesn't have an id yet
+        post_id: 0, 
       }));
+
     }
 
     const newPost = await postService.createPostService(
       caption,
       content,
-      parsedUserId, // Ensure user_id is passed to the service function as a number
+      
+      parsedUserId, 
       images
     );
 
@@ -117,8 +115,8 @@ export const createNewPost = async (req: Request, res: Response) => {
       (image: any) => ({
         originalname: image.originalname,
         filename: image.filename,
-        user_id: user_id, // Assuming this is the user_id of the post creator
-        post_id: 0, // You may need to adjust this depending on your logic
+        user_id: user_id,
+        post_id: 0,
       })
     );
 

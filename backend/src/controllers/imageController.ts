@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import * as uploadService from "../services/imageService";
+import * as imageDAO from "../dao/imageDAO";
 
 interface MulterRequest extends Request {
   file?: Express.Multer.File;
@@ -10,47 +10,37 @@ export function generateUniqueFilename(originalname: string): string {
   return `file_${timestamp}.png`;
 }
 
-export async function uploadFile(
-  req: MulterRequest,
-  res: Response
-): Promise<void> {
+export const uploadFile = async (
+  originalname: string,
+  filename: string,
+  buffer: Buffer,
+  user_id: number,
+  post_id: number
+) => {
   try {
-    if (!req.file) {
-      res.status(400).json({ error: "No file uploaded" });
-      return;
-    }
-
-    const { originalname, buffer } = req.file;
-    const email = req.query.email as string;
-    const user_id = Number(req.body.user_id);
-    const post_id = Number(req.body.post_id);
-    const filename = generateUniqueFilename(originalname);
-
-    const savedFile = await uploadService.uploadFile(
+    const savedFile = await imageDAO.uploadFile(
       originalname,
       filename,
-      buffer,
       user_id,
       post_id
     );
 
-    res.json(savedFile);
+    return savedFile;
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
+    throw new Error("Failed to upload file");
   }
-}
+};
 
-export async function getFilesByPostId(
+export const getFilesByPostId = async (
   req: Request,
   res: Response
-): Promise<void> {
+): Promise<void> => {
   try {
     const post_id = Number(req.params.post_id);
-    const files = await uploadService.getFilesByPostId(post_id);
+    const files = await imageDAO.getFilesByPostId(post_id);
     res.json(files);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
   }
-}
+};

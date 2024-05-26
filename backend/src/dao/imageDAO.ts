@@ -49,5 +49,3 @@ class ImageDAO {
 }
 
 export default new ImageDAO();
-
-

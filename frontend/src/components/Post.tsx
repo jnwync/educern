@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { UserType, CommentType, PostType } from "./NewsFeed";
-
+  
+interface FileType {
+  id: number;
+  originalname: string;
+  filename: string;
+  user_id: number;
+  post_id: number;
+}
 interface PostProps {
   post: PostType;
 }
@@ -11,6 +18,7 @@ const Post: React.FC<PostProps> = ({ post }) => {
   const [comments, setComments] = useState<CommentType[]>([]);
   const [user, setUser] = useState<UserType | null>(null);
   const [votes, setVotes] = useState<number>(0);
+  const [files, setFiles] = useState<FileType[]>([]);
 
 
   useEffect(() => {
@@ -32,16 +40,13 @@ const Post: React.FC<PostProps> = ({ post }) => {
   }, [post]);
 
   useEffect(() => {
-    console.log("Post user_id:", post.user_id);
-    console.log("Post post_id:", post.post_id);
-
     const fetchUser = async () => {
 
+    if (post.user_id) {
       if (!token) {
         console.error("No token found");
         return;
       }
-      if (post.user && post.user_id) {
 
         try {
           const response = await axios.get<UserType>(
@@ -65,9 +70,21 @@ const Post: React.FC<PostProps> = ({ post }) => {
       }
     };
 
+    const fetchFiles = async () => {
+      try {
+        const response = await axios.get<FileType[]>(
+          `http://localhost:3000/images/${post.post_id}`
+        );
+        setFiles(response.data);
+      } catch (error) {
+        console.error("Error fetching files", error);
+      }
+    };
+
     fetchUser();
     fetchVotes();
-  }, [post.post_id, post.user]);
+    fetchFiles();
+  }, [post.post_id, post.user_id]);
 
   const handleLikeClick = async () => {
     try {
@@ -78,34 +95,6 @@ const Post: React.FC<PostProps> = ({ post }) => {
     }
   };
 
-  const handleImageUpload = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = event.target.files?.[0];
-
-    if (!file) return;
-
-    const formData = new FormData();
-    formData.append("images", file);
-    formData.append("user_id", String(post.user_id));
-    formData.append("post_id", String(post.post_id));
-
-    try {
-      const response = await axios.post(
-        "http://localhost:3000/images/upload",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      console.log("Image uploaded successfully!");
-    } catch (error) {
-      console.error("Error uploading image", error);
-    }
-  };
 
   return (
     <div className="p-4 mb-4 text-white rounded-lg shadow-md bg-stone-900 border-stone-950">
@@ -124,10 +113,17 @@ const Post: React.FC<PostProps> = ({ post }) => {
       <h2 className="p-3 text-2xl font-bold">{post.caption}</h2>
       <p>{post.content}</p>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {post.image && (
-          <img src={post.image} alt="Post" className="w-full mt-2 rounded-md" />
-        )}
-      </div>
+    {files.map((file) => (
+    <div key={file.id} className="relative">
+      <img
+        src={`../../../backend/src/images/${file.filename}.png`}
+        alt={`${file.filename}`}
+        className="w-full mt-2 rounded-md shadow-md"
+      />
+    </div>
+  ))}
+</div>
+
       <div className="flex items-center p-4">
         <button
           onClick={handleLikeClick}
@@ -146,24 +142,18 @@ const Post: React.FC<PostProps> = ({ post }) => {
           </svg>
           <span>{votes}</span>
         </button>
-        <div className="w-0.5 h-8 bg-gray-400"></div>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleImageUpload}
-          className="w-full px-4 py-2 border border-b-0 border-gray-400 rounded-tr-md rounded-br-md bg-stone-900 focus:outline-none"
-        />
+
       </div>
       <div className="mt-4">
-        {
-          comments.map((comment) => (
-            <div key={comment.comment_id} className="p-2 mt-2 border-t">
-              <p className="font-semibold">
-                {comment.user.first_name} {comment.user.last_name}
-              </p>
-              <p>{comment.content}</p>
-            </div>
-          ))}
+
+        {comments.map((comment) => (
+          <div key={comment.comment_id} className="p-2 mt-2 border-t">
+            <p className="font-bold">
+              {comment.user.first_name} {comment.user.last_name}
+            </p>
+            <p>{comment.content}</p>
+          </div>
+        ))}
       </div>
     </div>
   );

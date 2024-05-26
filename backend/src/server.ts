@@ -3,6 +3,7 @@ import bodyParser from "body-parser";
 import userRoute from "./routes/userRoute";
 import postRoute from "./routes/postRoute";
 import commentRoute from "./routes/commentRoute";
+import imageRoute from "./routes/imageRoute";
 import cors from "cors";
 
 const app = express();
@@ -17,6 +18,7 @@ app.use(bodyParser.json());
 app.use("/users", userRoute);
 app.use("/posts", postRoute);
 app.use("/comments", commentRoute);
+app.use("/images", imageRoute);
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {

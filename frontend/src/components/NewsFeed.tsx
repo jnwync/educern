@@ -25,12 +25,14 @@ export interface PostType {
   image?: string;
   user: UserType;
   votes: number;
+  File: File[]
   Comment: CommentType[];
 }
 
 const NewsFeed = () => {
   const [posts, setPosts] = useState<PostType[]>([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [userId, setUserId] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchPosts = async () => {

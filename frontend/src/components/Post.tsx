@@ -2,14 +2,6 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { UserType, CommentType, PostType } from "./NewsFeed";
 
-interface FileType {
-  id: number;
-  originalname: string;
-  filename: string;
-  user_id: number;
-  post_id: number;
-}
-
 interface PostProps {
   post: PostType;
 }
@@ -19,20 +11,24 @@ const Post: React.FC<PostProps> = ({ post }) => {
   const [comments, setComments] = useState<CommentType[]>([]);
   const [user, setUser] = useState<UserType | null>(null);
   const [votes, setVotes] = useState<number>(0);
-  const [files, setFiles] = useState<FileType[]>([]);
+  const [newComment, setNewComment] = useState<string>("")
 
   useEffect(() => {
     const fetchComments = async () => {
       try {
+        console.log("Fetching comments for post_id: ", post.post_id);
         const response = await axios.get<CommentType[]>(
           `http://localhost:3000/comments/${post.post_id}`
         );
         setComments(response.data);
+        console.log("Array of comments", comments);
+        console.log("Fetched comments: ", response.data);
       } catch (error) {
         console.error("Error fetching comments", error);
       }
     };
     fetchComments();
+    console.log("array of comments", comments);
   }, [post]);
 
   useEffect(() => {
@@ -42,10 +38,10 @@ const Post: React.FC<PostProps> = ({ post }) => {
         return;
       }
 
-      if (post.user_id) {
+      if (post.user && post.user.user_id) {
         try {
           const response = await axios.get<UserType>(
-            `http://localhost:3000/users/${post.user_id}`
+            `http://localhost:3000/users/${post.user.user_id}`
           );
           setUser(response.data);
         } catch (error) {
@@ -65,21 +61,9 @@ const Post: React.FC<PostProps> = ({ post }) => {
       }
     };
 
-    const fetchFiles = async () => {
-      try {
-        const response = await axios.get<FileType[]>(
-          `http://localhost:3000/images/${post.post_id}`
-        );
-        setFiles(response.data);
-      } catch (error) {
-        console.error("Error fetching files", error);
-      }
-    };
-
     fetchUser();
     fetchVotes();
-    fetchFiles();
-  }, [post.post_id, post.user_id, token]);
+  }, [post.post_id, post.user]);
 
   const handleLikeClick = async () => {
     try {
@@ -89,6 +73,28 @@ const Post: React.FC<PostProps> = ({ post }) => {
       console.error("Error liking post", error);
     }
   };
+
+  const handleCommentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setNewComment(event.target.value);
+  };
+  const handleCommentSubmit = async () => {
+    try {
+      const response = await axios.post<CommentType>(
+        `http://localhost:3000/comments`,
+        { content: newComment, post_id: post.post_id, user_id: user?.user_id },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setComments([...comments, response.data]);
+      setNewComment("");
+    } catch (error) {
+      console.error("Error submitting comment", error);
+    }
+  };
+
+
+  useEffect(() => {
+    handleCommentSubmit()
+  }, [])
 
   return (
     <div className="p-4 mb-4 text-white rounded-lg shadow-md bg-stone-900 border-stone-950">
@@ -107,15 +113,9 @@ const Post: React.FC<PostProps> = ({ post }) => {
       <h2 className="p-3 text-2xl font-bold">{post.caption}</h2>
       <p>{post.content}</p>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {files.map((file) => (
-          <div key={file.id} className="relative">
-            <img
-              src={`../../../backend/src/images/${file.filename}.png`}
-              alt={`${file.filename}`}
-              className="w-full mt-2 rounded-md shadow-md"
-            />
-          </div>
-        ))}
+        {post.image && (
+          <img src={post.image} alt="Post" className="w-full mt-2 rounded-md" />
+        )}
       </div>
       <div className="flex items-center p-4">
         <button
@@ -135,16 +135,28 @@ const Post: React.FC<PostProps> = ({ post }) => {
           </svg>
           <span>{votes}</span>
         </button>
+        <div className="w-0.5 h-8 bg-gray-400"></div>
+        <input
+          type="text"
+          className="w-full px-4 py-2 border border-b-0 border-gray-400 rounded-tr-md rounded-br-md bg-stone-900 focus:outline-none"
+          placeholder="Type here to comment..."
+          value={newComment}
+          onChange={handleCommentChange}
+        />
       </div>
+      <button
+      onClick={handleCommentSubmit}
+      >Send Comment</button>
       <div className="mt-4">
-        {comments.map((comment) => (
-          <div key={comment.comment_id} className="p-2 mt-2 border-t">
-            <p className="font-semibold">
-              {comment.user.first_name} {comment.user.last_name}
-            </p>
-            <p>{comment.content}</p>
-          </div>
-        ))}
+        {
+          comments.map((comment) => (
+            <div key={comment.comment_id} className="p-2 mt-2 border-t">
+              <p className="font-semibold">
+                {comment.user.first_name} {comment.user.last_name}
+              </p>
+              <p>{comment.content}</p>
+            </div>
+          ))}
       </div>
     </div>
   );

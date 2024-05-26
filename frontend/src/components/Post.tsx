@@ -32,16 +32,20 @@ const Post: React.FC<PostProps> = ({ post }) => {
   }, [post]);
 
   useEffect(() => {
+    console.log("Post user_id:", post.user_id);
+    console.log("Post post_id:", post.post_id);
+
     const fetchUser = async () => {
+
       if (!token) {
         console.error("No token found");
         return;
       }
+      if (post.user && post.user_id) {
 
-      if (post.user && post.user.user_id) {
         try {
           const response = await axios.get<UserType>(
-            `http://localhost:3000/users/${post.user.user_id}`
+            `http://localhost:3000/users/${post.user_id}`
           );
           setUser(response.data);
         } catch (error) {
@@ -77,6 +81,7 @@ const Post: React.FC<PostProps> = ({ post }) => {
   const handleCommentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setNewComment(event.target.value);
   };
+
   const handleCommentSubmit = async () => {
     try {
       const response = await axios.post<CommentType>(
@@ -117,6 +122,20 @@ const Post: React.FC<PostProps> = ({ post }) => {
           <img src={post.image} alt="Post" className="w-full mt-2 rounded-md" />
         )}
       </div>
+      <p className="font-bold text-lg pt-4">
+        Comments:
+      </p>
+      <div className="mt-4">
+        {
+          comments.map((comment) => (
+            <div key={comment.comment_id} className="p-2 mt-2 border-t">
+              <p className="font-semibold">
+                {comment.user.first_name} {comment.user.last_name}
+              </p>
+              <p>{comment.content}</p>
+            </div>
+          ))}
+      </div>
       <div className="flex items-center p-4">
         <button
           onClick={handleLikeClick}
@@ -138,25 +157,20 @@ const Post: React.FC<PostProps> = ({ post }) => {
         <div className="w-0.5 h-8 bg-gray-400"></div>
         <input
           type="text"
+          accept="text"
           className="w-full px-4 py-2 border border-b-0 border-gray-400 rounded-tr-md rounded-br-md bg-stone-900 focus:outline-none"
           placeholder="Type here to comment..."
           value={newComment}
           onChange={handleCommentChange}
         />
-      </div>
-      <button
-      onClick={handleCommentSubmit}
-      >Send Comment</button>
-      <div className="mt-4">
-        {
-          comments.map((comment) => (
-            <div key={comment.comment_id} className="p-2 mt-2 border-t">
-              <p className="font-semibold">
-                {comment.user.first_name} {comment.user.last_name}
-              </p>
-              <p>{comment.content}</p>
-            </div>
-          ))}
+        <div className="p-2">
+          <button
+            onClick={handleCommentSubmit}
+            className="px-4 py-2 mt-2 text-white bg-blue-500 rounded-md"
+          >
+            Submit
+          </button>
+        </div>
       </div>
     </div>
   );

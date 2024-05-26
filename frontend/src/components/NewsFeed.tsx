@@ -19,6 +19,7 @@ export interface CommentType {
 
 export interface PostType {
   post_id: number;
+  user_id: number;
   caption: string;
   content: string;
   image?: string;

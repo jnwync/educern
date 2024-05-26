@@ -8,10 +8,11 @@ interface MulterRequest extends Request {
 export function generateUniqueFilename(
   originalname: string,
   email: string,
-  user_id: number
+  user_id: number,
+  post_id: number
 ): string {
   const timestamp = new Date().getTime();
-  return `file_${timestamp}_${user_id}_${email}.png`;
+  return `file_${timestamp}_${user_id}_${post_id}_${email}.png`;
 }
 
 class ImageController {
@@ -24,8 +25,14 @@ class ImageController {
 
       const { originalname, buffer } = req.file;
       const email = req.query.email as string;
-      const user_id = req.body.user_id ? Number(req.body.user_id) : 0;
-      const filename = generateUniqueFilename(originalname, email, user_id);
+      const user_id = Number(req.body.user_id);
+      const post_id = Number(req.body.post_id);
+      const filename = generateUniqueFilename(
+        originalname,
+        email,
+        user_id,
+        post_id
+      );
 
       const savedFile = await uploadService.uploadFile(
         originalname,

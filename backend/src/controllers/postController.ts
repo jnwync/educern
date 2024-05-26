@@ -1,16 +1,9 @@
 import { Request, Response } from "express";
 import * as postService from "../services/postService";
-import * as userService from "../services/userService";
 import * as imageService from "../services/imageService";
 import { File } from "../dao/imageDAO";
-
 interface MulterRequest extends Request {
   file?: Express.Multer.File;
-}
-
-export function generateUniqueFilename(originalname: string): string {
-  const timestamp = new Date().getTime();
-  return `file_${timestamp}.png`;
 }
 
 export const getAllPosts = async (req: Request, res: Response) => {
@@ -52,11 +45,13 @@ export const updatePost = async (req: Request, res: Response) => {
 export const upvotePost = async (req: Request, res: Response) => {
   try {
     const postId = Number(req.params.id);
-    const updatedPost = await postService.upvotePostService(postId);
+    await postService.upvotePostService(postId);
+    res.status(200).send();
   } catch (error) {
-    console.error(`Error upvoting post with ID ${req.params.id}`, error)
+    console.error(`Error upvoting post with ID ${req.params.id}`, error);
+    res.status(500).json({ error: "Error upvoting post" });
   }
-}
+};
 
 export const deletePost = async (req: Request, res: Response) => {
   try {
@@ -80,45 +75,34 @@ export const createPost = async (req: Request, res: Response) => {
       return res.status(400).json({ error: "user_id is required" });
     }
 
-    // Initialize an empty array of type File
     let images: File[] = [];
 
-    // Create the post first
+    if (req.files) {
+      const files = req.files as Express.Multer.File[];
+      images = files.map((file) => ({
+        originalname: file.originalname,
+        filename: imageService.generateUniqueFilename(file.originalname),
+        user_id: user_id,
+        post_id: 0,
+      }));
+
+      for (const file of files) {
+        await imageService.uploadFile(
+          file.originalname,
+          imageService.generateUniqueFilename(file.originalname),
+          file.buffer,
+          user_id,
+          0 // Assuming this is a new post and doesn't have an id yet
+        );
+      }
+    }
+
     const newPost = await postService.createPostService(
       caption,
       content,
       user_id,
       images
     );
-
-    if (req.files) {
-      const files = req.files as Express.Multer.File[];
-      images = files.map((file) => ({
-        originalname: file.originalname,
-        filename: generateUniqueFilename(file.originalname),
-        user_id: user_id,
-        post_id: newPost.post_id,
-        id: 0, // Assuming this is a new file and doesn't have an id yet
-      }));
-
-      // Upload each file
-      for (const file of files) {
-        await imageService.uploadFile(
-          file.originalname,
-          generateUniqueFilename(file.originalname),
-          file.buffer,
-          user_id,
-          newPost.post_id
-        );
-      }
-
-      // Update the post with the files
-      await postService.updatePostService(newPost.post_id, {
-        File: {
-          create: images,
-        },
-      });
-    }
 
     res.status(201).json(newPost);
   } catch (error) {
@@ -139,8 +123,8 @@ export const createNewPost = async (req: Request, res: Response) => {
       (image: any) => ({
         originalname: image.originalname,
         filename: image.filename,
-        user_id: user_id, // Assuming this is the user_id of the post creator
-        post_id: 0, // You may need to adjust this depending on your logic
+        user_id: user_id,
+        post_id: 0,
       })
     );
 

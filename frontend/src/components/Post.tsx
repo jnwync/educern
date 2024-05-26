@@ -12,11 +12,14 @@ const Post: React.FC<PostProps> = ({ post }) => {
   const [votes, setVotes] = useState<number>(0);
 
   useEffect(() => {
+    console.log("Post user_id:", post.user_id);
+    console.log("Post post_id:", post.post_id);
+
     const fetchUser = async () => {
-      if (post.user && post.user.user_id) {
+      if (post.user && post.user_id) {
         try {
           const response = await axios.get<UserType>(
-            `http://localhost:3000/users/${post.user.user_id}`
+            `http://localhost:3000/users/${post.user_id}`
           );
           setUser(response.data);
         } catch (error) {
@@ -61,6 +64,35 @@ const Post: React.FC<PostProps> = ({ post }) => {
     }
   };
 
+  const handleImageUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("images", file);
+    formData.append("user_id", String(post.user_id));
+    formData.append("post_id", String(post.post_id));
+
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/images/upload",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      console.log("Image uploaded successfully!");
+    } catch (error) {
+      console.error("Error uploading image", error);
+    }
+  };
+
   return (
     <div className="p-4 mb-4 text-white rounded-lg shadow-md bg-stone-900 border-stone-950">
       {user && (
@@ -102,9 +134,10 @@ const Post: React.FC<PostProps> = ({ post }) => {
         </button>
         <div className="w-0.5 h-8 bg-gray-400"></div>
         <input
-          type="text"
+          type="file"
+          accept="image/*"
+          onChange={handleImageUpload}
           className="w-full px-4 py-2 border border-b-0 border-gray-400 rounded-tr-md rounded-br-md bg-stone-900 focus:outline-none"
-          placeholder="Type here to comment..."
         />
       </div>
       <div className="mt-4">

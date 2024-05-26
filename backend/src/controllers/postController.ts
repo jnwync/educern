@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import * as postService from "../services/postService";
+import * as userService from "../services/userService";
 
 export const getAllPosts = async (req: Request, res: Response) => {
   try {
@@ -96,5 +97,44 @@ export const createNewPost = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error creating post:", error);
     res.status(500).json({ error: "Error creating post" });
+  }
+};
+
+export const getUserByIdAndPostIdController = async (
+  req: Request,
+  res: Response
+) => {
+  const { id } = req.params;
+
+  try {
+    const post = await postService.getPostByIdService(Number(id));
+
+    if (!post) {
+      res.status(404).json({ message: "Post not found" });
+      return;
+    }
+
+    const user = await userService.getUserByIdService(post.user_id);
+
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
+    res.status(200).json({
+      post_id: post.post_id,
+      caption: post.caption,
+      content: post.content,
+      images: post.images,
+      user: {
+        user_id: user.user_id,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        email: user.email,
+      },
+      votes: post.votes,
+    });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
   }
 };

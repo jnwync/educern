@@ -12,7 +12,7 @@ export const createPostService = async (
   caption: string,
   content: string,
   user_id: number,
-  images: string[]
+  images: string[] = []
 ) => {
   const post = await postDao.createPost({
     caption,

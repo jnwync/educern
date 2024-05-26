@@ -10,5 +10,6 @@ router.get("/:id", postController.getPostById);
 router.post("/", upload.array("images", 3), postController.createPost);
 router.put("/:id", authenticateJWT, postController.updatePost);
 router.delete("/:id", authenticateJWT, postController.deletePost);
+router.put("/:id/upvote", postController.upvotePost);
 
 export default router;

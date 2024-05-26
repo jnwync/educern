@@ -1,4 +1,5 @@
 import * as postDao from "../dao/postDAO";
+import prisma from "../prismaClient";
 
 export const getAllPostsService = async () => {
   return postDao.getAllPosts();
@@ -30,4 +31,8 @@ export const updatePostService = async (id: number, data: any) => {
 
 export const deletePostService = async (id: number) => {
   return postDao.deletePost(id);
+};
+
+export const upvotePostService = async (id: number) => {
+  return postDao.upvotePost(id);
 };

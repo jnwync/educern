@@ -5,7 +5,12 @@ export const getAllCommentsService = async () => {
 };
 
 export const getCommentByIdService = async (id: number) => {
-  return commentDao.getCommentById(id);
+  try {
+    return commentDao.getComments(id);
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
 };
 
 export const createCommentService = async (data: any) => {

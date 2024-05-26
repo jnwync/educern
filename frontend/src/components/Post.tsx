@@ -14,14 +14,40 @@ interface PostProps {
 }
 
 const Post: React.FC<PostProps> = ({ post }) => {
+  const token = localStorage.getItem("Token");
   const [comments, setComments] = useState<CommentType[]>([]);
   const [user, setUser] = useState<UserType | null>(null);
   const [votes, setVotes] = useState<number>(0);
   const [files, setFiles] = useState<FileType[]>([]);
 
+
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        console.log("Fetching comments for post_id: ", post.post_id);
+        const response = await axios.get<CommentType[]>(
+          `http://localhost:3000/comments/${post.post_id}`
+        );
+        setComments(response.data);
+        console.log("Array of comments", comments);
+        console.log("Fetched comments: ", response.data);
+      } catch (error) {
+        console.error("Error fetching comments", error);
+      }
+    };
+    fetchComments();
+    console.log("array of comments", comments);
+  }, [post]);
+
   useEffect(() => {
     const fetchUser = async () => {
-      if (post.user_id) {
+
+    if (post.user_id) {
+      if (!token) {
+        console.error("No token found");
+        return;
+      }
+
         try {
           const response = await axios.get<UserType>(
             `http://localhost:3000/users/${post.user_id}`
@@ -33,21 +59,10 @@ const Post: React.FC<PostProps> = ({ post }) => {
       }
     };
 
-    const fetchComments = async () => {
-      try {
-        const response = await axios.get<CommentType[]>(
-          `http://localhost:3000/posts/${post.post_id}/comments`
-        );
-        setComments(response.data);
-      } catch (error) {
-        console.error("Error fetching comments", error);
-      }
-    };
-
     const fetchVotes = async () => {
       try {
         const response = await axios.get<number>(
-          `http://localhost:3000/posts/${post.post_id}/votes`
+          `http://localhost:3000/votes/${post.post_id}`
         );
         setVotes(response.data);
       } catch (error) {
@@ -67,14 +82,13 @@ const Post: React.FC<PostProps> = ({ post }) => {
     };
 
     fetchUser();
-    fetchComments();
     fetchVotes();
     fetchFiles();
   }, [post.post_id, post.user_id]);
 
   const handleLikeClick = async () => {
     try {
-      await axios.post(`http://localhost:3000/posts/${post.post_id}/vote`);
+      await axios.put(`http://localhost:3000/posts/${post.post_id}/upvote`);
       setVotes((prevVotes) => prevVotes + 1);
     } catch (error) {
       console.error("Error liking post", error);
@@ -131,6 +145,7 @@ const Post: React.FC<PostProps> = ({ post }) => {
 
       </div>
       <div className="mt-4">
+
         {comments.map((comment) => (
           <div key={comment.comment_id} className="p-2 mt-2 border-t">
             <p className="font-bold">

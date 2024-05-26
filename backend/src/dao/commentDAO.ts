@@ -10,6 +10,14 @@ export const getCommentById = async (id: number) => {
   });
 };
 
+export const getComments = async (id: number) => {
+  const sample = await prisma.comment.findMany({
+    where: {post_id: id},
+    include : {user: true}
+  })
+  return sample
+}
+
 export const createComment = async (data: any) => {
   return prisma.comment.create({
     data,

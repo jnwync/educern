@@ -1,3 +1,4 @@
+
   import { PrismaClient } from "@prisma/client";
   import { File } from "../dao/imageDAO";
 
@@ -96,5 +97,9 @@
 
     return files;
   };
+
+export const upvotePostService = async (id: number) => {
+  return postDao.upvotePost(id);
+};
 
   export default prisma;

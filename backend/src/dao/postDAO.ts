@@ -41,7 +41,8 @@ export const createPostService = async (
 ) => {
   const newPost = await prisma.post.create({
     data: {
-      caption,
+  
+    caption,
       content,
       user_id,
       File: {
@@ -81,6 +82,7 @@ export const deletePostService = async (id: number) => {
   return deletedPost;
 };
 
+
 export const getFilesByPostId = async (post_id: number) => {
   return prisma.file.findMany({
     where: {
@@ -89,4 +91,16 @@ export const getFilesByPostId = async (post_id: number) => {
   });
 };
 
+export const upvotePost = async (id: number) => {
+  return await prisma.post.update({
+    where: { post_id: id },
+    data: {
+      votes: {
+        increment: 1,
+      }
+    }
+  });
+};
+
 export default prisma;
+

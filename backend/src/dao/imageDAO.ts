@@ -3,46 +3,51 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export interface File {
+  id?: number;
   originalname: string;
   filename: string;
   user_id: number;
   post_id: number;
 }
 
-export const uploadFile = async (
-  originalname: string,
-  filename: string,
-  user_id: number,
-  post_id: number
-): Promise<File> => {
-  const file = await prisma.file.create({
-    data: {
-      originalname,
-      filename,
-      user_id,
-      post_id,
-    },
-  });
+class ImageDAO {
+  async uploadFile(
+    originalname: string,
+    filename: string,
+    user_id: number,
+    post_id: number
+  ): Promise<File> {
+    const file = await prisma.file.create({
+      data: {
+        originalname,
+        filename,
+        user_id,
+        post_id,
+      },
+    });
 
-  return file;
-};
+    return file;
+  }
 
-export const getFilesByPostId = async (post_id: number): Promise<File[]> => {
-  const files = await prisma.file.findMany({
-    where: {
-      post_id,
-    },
-  });
+  async getFilesByPostId(postId: number): Promise<File[]> {
+    const files = await prisma.file.findMany({
+      where: { post_id: postId },
+    });
 
-  return files;
-};
+    return files;
+  }
 
-export const deleteFile = async (file_id: number): Promise<File> => {
-  const deletedFile = await prisma.file.delete({
-    where: {
-      id: file_id,
-    },
-  });
+  async deleteFile(file_id: number): Promise<File | null> {
+    const deletedFile = await prisma.file.delete({
+      where: {
+        id: file_id,
+      },
+    });
 
-  return deletedFile;
-};
+    return deletedFile;
+  }
+}
+
+export default new ImageDAO();
+
+

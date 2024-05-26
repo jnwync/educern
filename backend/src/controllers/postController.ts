@@ -65,42 +65,34 @@ export const deletePost = async (req: Request, res: Response) => {
 };
 
 export const createPost = async (req: Request, res: Response) => {
-  const { caption, content } = req.body;
-  let { user_id } = req.body;
+  const { caption, content, user_id } = req.body;
 
   try {
-    user_id = Number(user_id);
-
-    if (!user_id) {
-      return res.status(400).json({ error: "user_id is required" });
+    // Validate user_id
+    const parsedUserId = Number(user_id);
+    if (!parsedUserId || isNaN(parsedUserId)) {
+      return res.status(400).json({ error: "user_id must be a valid number" });
     }
 
-    let images: File[] = [];
+    let images: Partial<File>[] = [];
 
     if (req.files) {
       const files = req.files as Express.Multer.File[];
       images = files.map((file) => ({
         originalname: file.originalname,
-        filename: imageService.generateUniqueFilename(file.originalname),
-        user_id: user_id,
-        post_id: 0,
+
+        filename: generateUniqueFilename(file.originalname),
+        user_id: parsedUserId,
+        post_id: 0, 
       }));
 
-      for (const file of files) {
-        await imageService.uploadFile(
-          file.originalname,
-          imageService.generateUniqueFilename(file.originalname),
-          file.buffer,
-          user_id,
-          0 // Assuming this is a new post and doesn't have an id yet
-        );
-      }
     }
 
     const newPost = await postService.createPostService(
       caption,
       content,
-      user_id,
+      
+      parsedUserId, 
       images
     );
 

@@ -26,6 +26,7 @@ model User {
   deleted_at DateTime?
   Comment    Comment[]
   Post       Post[]
+  File       File[]
 }
 
 model Comment {
@@ -40,21 +41,22 @@ model Comment {
 }
 
 model Post {
-  post_id   Int     @id @default(autoincrement())
-  caption   String
-  content   String
-  user_id   Int
-  user      User    @relation(fields: [user_id], references: [user_id])
-  Comment   Comment[] 
-  File      File[]
-  votes     Int
+  post_id Int       @id @default(autoincrement())
+  caption String
+  content String
+  user_id Int
+  user    User      @relation(fields: [user_id], references: [user_id])
+  Comment Comment[]
+  File    File[]
+  votes   Int
 }
 
 model File {
-  id          Int    @id @default(autoincrement())
+  id           Int    @id @default(autoincrement())
   originalname String
   filename     String
   user_id      Int
   post_id      Int
+  user         User   @relation(fields: [user_id], references: [user_id])
   post         Post   @relation(fields: [post_id], references: [post_id])
 }

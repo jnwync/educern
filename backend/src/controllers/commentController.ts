@@ -25,12 +25,19 @@ export const getCommentById = async (req: Request, res: Response) => {
   }
 };
 
-export const createComment = async (req: Request, res: Response) => {
+export const createCommentController = async (req: Request, res: Response) => {
+  const { content, user_id, post_id } = req.body;
+
+  if (!content || !user_id || !post_id) {
+    return res.status(400).json({ error: "Content, user_id, and post_id are required" });
+  }
+
   try {
-    const newComment = await commentService.createCommentService(req.body);
-    res.status(201).json(newComment);
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    const comment = await commentService.createCommentService(content, user_id, post_id);
+    res.status(201).json(comment);
+  } catch (error) {
+    console.error('Error creating comment:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 };
 

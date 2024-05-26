@@ -11,7 +11,7 @@ const Post: React.FC<PostProps> = ({ post }) => {
   const [comments, setComments] = useState<CommentType[]>([]);
   const [user, setUser] = useState<UserType | null>(null);
   const [votes, setVotes] = useState<number>(0);
-
+  const [newComment, setNewComment] = useState<string>("")
 
   useEffect(() => {
     const fetchComments = async () => {
@@ -74,6 +74,28 @@ const Post: React.FC<PostProps> = ({ post }) => {
     }
   };
 
+  const handleCommentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setNewComment(event.target.value);
+  };
+  const handleCommentSubmit = async () => {
+    try {
+      const response = await axios.post<CommentType>(
+        `http://localhost:3000/comments`,
+        { content: newComment, post_id: post.post_id, user_id: user?.user_id },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setComments([...comments, response.data]);
+      setNewComment("");
+    } catch (error) {
+      console.error("Error submitting comment", error);
+    }
+  };
+
+
+  useEffect(() => {
+    handleCommentSubmit()
+  }, [])
+
   return (
     <div className="p-4 mb-4 text-white rounded-lg shadow-md bg-stone-900 border-stone-950">
       {user && (
@@ -118,8 +140,13 @@ const Post: React.FC<PostProps> = ({ post }) => {
           type="text"
           className="w-full px-4 py-2 border border-b-0 border-gray-400 rounded-tr-md rounded-br-md bg-stone-900 focus:outline-none"
           placeholder="Type here to comment..."
+          value={newComment}
+          onChange={handleCommentChange}
         />
       </div>
+      <button
+      onClick={handleCommentSubmit}
+      >Send Comment</button>
       <div className="mt-4">
         {
           comments.map((comment) => (

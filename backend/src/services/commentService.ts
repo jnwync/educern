@@ -13,8 +13,13 @@ export const getCommentByIdService = async (id: number) => {
   }
 };
 
-export const createCommentService = async (data: any) => {
-  return commentDao.createComment(data);
+export const createCommentService = async (content: string, user_id: number, post_id: number) => {
+  const comment = await commentDao.createComment({
+    content,
+    user_id,
+    post_id
+  });
+  return comment
 };
 
 export const updateCommentService = async (id: number, data: any) => {

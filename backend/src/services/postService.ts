@@ -1,38 +1,95 @@
-import * as postDao from "../dao/postDAO";
-import prisma from "../prismaClient";
+import { PrismaClient } from "@prisma/client";
+import * as imageDAO from "../dao/imageDAO";
+
+const prisma = new PrismaClient();
 
 export const getAllPostsService = async () => {
-  return postDao.getAllPosts();
+  const posts = await prisma.post.findMany({
+    include: {
+      user: true,
+    },
+  });
+  const postsWithImages = await Promise.all(
+    posts.map(async (post) => {
+      const images = await imageDAO.getFilesByPostId(post.post_id);
+      return { ...post, images };
+    })
+  );
+  return postsWithImages;
 };
 
 export const getPostByIdService = async (id: number) => {
-  return postDao.getPostById(id);
+  const post = await prisma.post.findUnique({
+    where: { post_id: id },
+    include: {
+      user: true,
+      File: true,
+    },
+  });
+  if (post) {
+    const images = await imageDAO.getFilesByPostId(post.post_id);
+    return { ...post, images };
+  }
+  return null;
 };
 
 export const createPostService = async (
   caption: string,
   content: string,
   user_id: number,
-  images: string[] = []
+  images: imageDAO.File[]
 ) => {
-  const post = await postDao.createPost({
-    caption,
-    content,
-    user_id,
-    images,
-    votes: 0,
+  const newPost = await prisma.post.create({
+    data: {
+      caption,
+      content,
+      user_id,
+      File: {
+        create: images.map((file) => ({
+          originalname: file.originalname,
+          filename: file.filename,
+          user_id: file.user_id,
+          post_id: file.post_id,
+        })),
+      },
+      votes: 0,
+    },
+    include: {
+      user: true,
+      File: true,
+    },
   });
-  return post;
+  return newPost;
 };
 
 export const updatePostService = async (id: number, data: any) => {
-  return postDao.updatePost(id, data);
+  const updatedPost = await prisma.post.update({
+    where: { post_id: id },
+    data,
+    include: {
+      user: true,
+      File: true,
+    },
+  });
+  return updatedPost;
 };
 
 export const deletePostService = async (id: number) => {
-  return postDao.deletePost(id);
+  const deletedPost = await prisma.post.delete({
+    where: { post_id: id },
+  });
+  return deletedPost;
 };
 
 export const upvotePostService = async (id: number) => {
-  return postDao.upvotePost(id);
+  return prisma.post.update({
+    where: { post_id: id },
+    data: {
+      votes: {
+        increment: 1,
+      },
+    },
+  });
 };
+
+export default prisma;

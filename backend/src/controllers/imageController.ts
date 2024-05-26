@@ -1,51 +1,46 @@
 import { Request, Response } from "express";
-import uploadService from "../services/imageService";
+import * as imageDAO from "../dao/imageDAO";
 
 interface MulterRequest extends Request {
   file?: Express.Multer.File;
 }
 
-export function generateUniqueFilename(
+export function generateUniqueFilename(originalname: string): string {
+  const timestamp = new Date().getTime();
+  return `file_${timestamp}.png`;
+}
+
+export const uploadFile = async (
   originalname: string,
-  email: string,
+  filename: string,
+  buffer: Buffer,
   user_id: number,
   post_id: number
-): string {
-  const timestamp = new Date().getTime();
-  return `file_${timestamp}_${user_id}_${post_id}_${email}.png`;
-}
+) => {
+  try {
+    const savedFile = await imageDAO.uploadFile(
+      originalname,
+      filename,
+      user_id,
+      post_id
+    );
 
-class ImageController {
-  async uploadFile(req: MulterRequest, res: Response): Promise<void> {
-    try {
-      if (!req.file) {
-        res.status(400).json({ error: "No file uploaded" });
-        return;
-      }
-
-      const { originalname, buffer } = req.file;
-      const email = req.query.email as string;
-      const user_id = Number(req.body.user_id);
-      const post_id = Number(req.body.post_id);
-      const filename = generateUniqueFilename(
-        originalname,
-        email,
-        user_id,
-        post_id
-      );
-
-      const savedFile = await uploadService.uploadFile(
-        originalname,
-        filename,
-        buffer
-      );
-
-      res.json(savedFile);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "Internal Server Error" });
-    }
+    return savedFile;
+  } catch (error) {
+    throw new Error("Failed to upload file");
   }
-}
+};
 
-export default ImageController;
+export const getFilesByPostId = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const post_id = Number(req.params.post_id);
+    const files = await imageDAO.getFilesByPostId(post_id);
+    res.json(files);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};

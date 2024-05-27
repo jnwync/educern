@@ -33,6 +33,21 @@ export const getPostByIdService = async (id: number) => {
   return null;
 };
 
+export const getVotesByIdService = async (id: number) => {
+  const post = await prisma.post.findUnique({
+    where: { post_id: id },
+    include: {
+      Upvote: true,
+    },
+  });
+
+  if (post) {
+    const votesCount = post.Upvote.length;
+    return { ...post, votesCount };
+  }
+  return null;
+};
+
 export const createPostService = async (
   caption: string,
   content: string,
@@ -41,8 +56,7 @@ export const createPostService = async (
 ) => {
   const newPost = await prisma.post.create({
     data: {
-  
-    caption,
+      caption,
       content,
       user_id,
       File: {
@@ -75,13 +89,20 @@ export const updatePostService = async (id: number, data: any) => {
   return updatedPost;
 };
 
-export const deletePostService = async (id: number) => {
-  const deletedPost = await prisma.post.delete({
+export const deletePost = async (id: number) => {
+
+  await prisma.comment.deleteMany({
+    where: { post_id: id },
+  })
+
+  await prisma.file.deleteMany({
+    where: { post_id: id },
+  })
+
+  return prisma.post.delete({
     where: { post_id: id },
   });
-  return deletedPost;
 };
-
 
 export const getFilesByPostId = async (post_id: number) => {
   return prisma.file.findMany({
@@ -91,15 +112,33 @@ export const getFilesByPostId = async (post_id: number) => {
   });
 };
 
-export const upvotePost = async (id: number) => {
-  return await prisma.post.update({
-    where: { post_id: id },
-    data: {
-      votes: {
-        increment: 1,
-      }
-    }
+export const upvotePost = async (user_id: number, post_id: number) => {
+  const existingUpvote = await prisma.upvote.findUnique({
+    where: {
+      user_id_post_id: {
+        user_id,
+        post_id,
+      },
+    },
   });
+
+  if (existingUpvote) {
+    return "User has upvoted this post already.";
+  } else {
+    await prisma.upvote.create({
+      data: {
+        user_id,
+        post_id,
+      },
+    });
+  }
+  await prisma.post.update({
+    where: { post_id },
+    data: {
+      votes: { increment: 1 },
+    },
+  });
+  return "Upvote successful.";
 };
 
 export default prisma;

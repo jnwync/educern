@@ -8,8 +8,9 @@ const router = express.Router();
 router.get("/", postController.getAllPosts);
 router.get("/:id", postController.getPostById);
 router.post("/", upload.array("images", 3), postController.createPost);
-router.put("/:id", authenticateJWT, postController.updatePost);
-router.delete("/:id", authenticateJWT, postController.deletePost);
-router.put("/:id/upvote", postController.upvotePost);
+router.put("/update", postController.updatePost); 
+router.delete("/:id", postController.deletePost);
+router.put("/upvote/:userId/:postId", postController.upvotePost);
+router.get("/votes", postController.getVotes);
 
 export default router;

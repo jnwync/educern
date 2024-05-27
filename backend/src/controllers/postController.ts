@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import express, { Request, Response } from "express";
 import * as postService from "../services/postService";
 import * as imageService from "../services/imageService";
 import { File } from "../dao/imageDAO";
@@ -44,14 +44,28 @@ export const updatePost = async (req: Request, res: Response) => {
 
 export const upvotePost = async (req: Request, res: Response) => {
   try {
-    const postId = Number(req.params.id);
-    await postService.upvotePostService(postId);
-    res.status(200).send();
+    const post_id = req.params.postId;
+    const user_id = req.params.postId;
+    if (isNaN(Number(post_id)) || isNaN(Number(user_id))) {
+      return res.status(400).json({ error: "Invalid postId or userId" });
+    }
+    await postService.upvotePostService(Number(post_id), Number(user_id));
+    res.status(200).send("Post upvoted successfully");
   } catch (error) {
     console.error(`Error upvoting post with ID ${req.params.id}`, error);
     res.status(500).json({ error: "Error upvoting post" });
   }
 };
+
+export const getVotes = async (req: Request, res: Response) => {
+  try {
+    const post = req.body.id
+    await postService.fetchVotes(post)
+    res.status(200).send()
+  } catch (error: any) {
+    console.error(error)
+  }
+}
 
 export const deletePost = async (req: Request, res: Response) => {
   try {

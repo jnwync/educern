@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import * as imageDAO from "../dao/imageDAO";
+import * as postDAO from "../dao/postDAO";
 
 const prisma = new PrismaClient();
 
@@ -81,15 +82,12 @@ export const deletePostService = async (id: number) => {
   return deletedPost;
 };
 
-export const upvotePostService = async (id: number) => {
-  return prisma.post.update({
-    where: { post_id: id },
-    data: {
-      votes: {
-        increment: 1,
-      },
-    },
-  });
+export const fetchVotes = async (id: number) => {
+  return await postDAO.getVotesByIdService(id);
+};
+
+export const upvotePostService = async (user_id: number, post_id: number) => {
+  return await postDAO.upvotePost(user_id, post_id);
 };
 
 export default prisma;

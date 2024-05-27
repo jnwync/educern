@@ -53,21 +53,22 @@ const Post: React.FC<PostProps> = ({ post }) => {
     const fetchVotes = async () => {
       try {
         const response = await axios.get<number>(
-          `http://localhost:3000/votes/${post.post_id}`
+          `http://localhost:3000/post/votes`
         );
         setVotes(response.data);
       } catch (error) {
         console.error("Error fetching votes", error);
       }
     };
-
     fetchUser();
     fetchVotes();
   }, [post.post_id, post.user]);
 
   const handleLikeClick = async () => {
     try {
-      await axios.put(`http://localhost:3000/posts/${post.post_id}/upvote`);
+      const post_id = post.post_id;
+      const user_id = user?.user_id;
+      await axios.put(`http://localhost:3000/posts/upvote/${post_id}/${user_id}`);
       setVotes((prevVotes) => prevVotes + 1);
     } catch (error) {
       console.error("Error liking post", error);
@@ -143,10 +144,15 @@ const Post: React.FC<PostProps> = ({ post }) => {
           value={newComment}
           onChange={handleCommentChange}
         />
+        <div className="pl-2 pb-1">
+          <button
+          onClick={handleCommentSubmit}
+          className="px-4 py-2 mt-2 text-white bg-blue-500 rounded-md"
+          >
+            Submit
+          </button>
+        </div>
       </div>
-      <button
-      onClick={handleCommentSubmit}
-      >Send Comment</button>
       <div className="mt-4">
         {
           comments.map((comment) => (

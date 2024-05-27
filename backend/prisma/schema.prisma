@@ -26,6 +26,7 @@ model User {
   deleted_at DateTime?
   Comment    Comment[]
   Post       Post[]
+  Upvote     Upvote[]
 }
 
 model Comment {
@@ -40,21 +41,34 @@ model Comment {
 }
 
 model Post {
-  post_id   Int     @id @default(autoincrement())
-  caption   String
-  content   String
-  user_id   Int
-  user      User    @relation(fields: [user_id], references: [user_id])
-  Comment   Comment[] 
-  File      File[]
-  votes     Int
+  post_id Int       @id @default(autoincrement())
+  caption String
+  content String
+  user_id Int
+  user    User      @relation(fields: [user_id], references: [user_id])
+  Comment Comment[]
+  File    File[]
+  votes   Int
+  Upvote  Upvote[]
 }
 
 model File {
-  id          Int    @id @default(autoincrement())
+  id           Int    @id @default(autoincrement())
   originalname String
   filename     String
   user_id      Int
   post_id      Int
   post         Post   @relation(fields: [post_id], references: [post_id])
+}
+
+model Upvote {
+  upvote_id  Int      @id @default(autoincrement())
+  user_id    Int
+  post_id    Int
+  created_at DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [user_id])
+  post Post @relation(fields: [post_id], references: [post_id])
+
+  @@unique([user_id, post_id])
 }

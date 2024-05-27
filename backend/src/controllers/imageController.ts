@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import * as imageDAO from "../dao/imageDAO";
+import imageDAO from "../dao/imageDAO";
 
 interface MulterRequest extends Request {
   file?: Express.Multer.File;

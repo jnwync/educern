@@ -27,6 +27,7 @@ model User {
   Comment    Comment[]
   Post       Post[] 
   Upvote     Upvote[]
+
 }
 
 model Comment {
@@ -50,6 +51,7 @@ model Post {
   File    File[]
   votes   Int
   Upvote  Upvote[]
+
 }
 
 model File {

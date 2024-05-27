@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
-import * as imageDAO from "../dao/imageDAO";
-import * as postService from "../services/postService";
+import imageDAO from "../dao/imageDAO";
 
 export function generateUniqueFilename(originalname: string): string {
   const timestamp = new Date().getTime();

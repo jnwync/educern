@@ -89,11 +89,19 @@ export const updatePostService = async (id: number, data: any) => {
   return updatedPost;
 };
 
-export const deletePostService = async (id: number) => {
-  const deletedPost = await prisma.post.delete({
+export const deletePost = async (id: number) => {
+
+  await prisma.comment.deleteMany({
+    where: { post_id: id },
+  })
+
+  await prisma.file.deleteMany({
+    where: { post_id: id },
+  })
+
+  return prisma.post.delete({
     where: { post_id: id },
   });
-  return deletedPost;
 };
 
 export const getFilesByPostId = async (post_id: number) => {

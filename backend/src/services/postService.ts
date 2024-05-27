@@ -76,10 +76,7 @@ export const updatePostService = async (id: number, data: any) => {
 };
 
 export const deletePostService = async (id: number) => {
-  const deletedPost = await prisma.post.delete({
-    where: { post_id: id },
-  });
-  return deletedPost;
+  return postDAO.deletePost(id);
 };
 
 export const fetchVotes = async (id: number) => {

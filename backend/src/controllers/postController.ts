@@ -72,9 +72,9 @@ export const deletePost = async (req: Request, res: Response) => {
     const postId = Number(req.params.id);
     await postService.deletePostService(postId);
     res.status(204).send();
-  } catch (error: any) {
+  } catch (error) {
     console.error(`Error deleting post with ID ${req.params.id}:`, error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 

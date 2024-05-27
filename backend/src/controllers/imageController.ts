@@ -1,46 +1,80 @@
 import { Request, Response } from "express";
 import imageDAO from "../dao/imageDAO";
+import * as imageService from "../services/imageService";
+import { generateUniqueFilename } from "../utils/filename";
+import * as postService from "../services/postService";
+import { File } from "../dao/imageDAO";
 
 interface MulterRequest extends Request {
   file?: Express.Multer.File;
 }
 
-export function generateUniqueFilename(originalname: string): string {
-  const timestamp = new Date().getTime();
-  return `file_${timestamp}.png`;
-}
-
 export const uploadFile = async (
-  originalname: string,
-  filename: string,
-  buffer: Buffer,
-  user_id: number,
-  post_id: number
-) => {
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { caption, content, user_id } = req.body;
+
   try {
-    const savedFile = await imageDAO.uploadFile(
-      originalname,
-      filename,
-      user_id,
-      post_id
+    // Validate user_id
+    const parsedUserId = Number(user_id);
+    if (!parsedUserId || isNaN(parsedUserId)) {
+      res.status(400).json({ error: "user_id must be a valid number" });
+      return;
+    }
+
+    // Create the post first to get the post_id
+    const newPost = await postService.createPostService(
+      caption,
+      content,
+      parsedUserId
     );
 
-    return savedFile;
+    if (req.files) {
+      const files = req.files as Express.Multer.File[];
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const uniqueFilename = generateUniqueFilename(
+          newPost.post_id,
+          file.originalname
+        );
+        await imageService.uploadFile(
+          file.originalname,
+          uniqueFilename,
+          file.buffer,
+          parsedUserId,
+          newPost.post_id
+        );
+      }
+    }
+
+    res.status(201).json(newPost);
   } catch (error) {
-    throw new Error("Failed to upload file");
+    console.error("Error creating post:", error);
+    res.status(500).json({ error: "Error creating post" });
   }
 };
 
-export const getFilesByPostId = async (
+export const getFileById = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   try {
-    const post_id = Number(req.params.post_id);
-    const files = await imageDAO.getFilesByPostId(post_id);
-    res.json(files);
+    const fileId = Number(req.params.id);
+    if (isNaN(fileId)) {
+      res.status(400).json({ error: "Invalid file ID" });
+      return;
+    }
+
+    const file = await imageService.getFileById(fileId);
+    if (!file) {
+      res.status(404).json({ error: "File not found" });
+      return;
+    }
+
+    res.json(file);
   } catch (error) {
-    console.error(error);
+    console.error("Error fetching file by ID:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };

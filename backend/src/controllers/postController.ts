@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import * as postService from "../services/postService";
 import * as imageService from "../services/imageService";
 import { File } from "../dao/imageDAO";
+import { generateUniqueFilename } from "../utils/filename";
 
 interface MulterRequest extends Request {
   file?: Express.Multer.File;
@@ -88,7 +89,7 @@ export const createPost = async (req: Request, res: Response) => {
       const files = req.files as Express.Multer.File[];
       images = files.map((file) => ({
         originalname: file.originalname,
-        filename: imageService.generateUniqueFilename(file.originalname),
+        filename: generateUniqueFilename(newPost.post_id, file.originalname),
         user_id: parsedUserId,
         post_id: newPost.post_id, // Use the newly created post's ID
       }));
@@ -97,7 +98,7 @@ export const createPost = async (req: Request, res: Response) => {
       for (const file of files) {
         await imageService.uploadFile(
           file.originalname,
-          imageService.generateUniqueFilename(file.originalname),
+          generateUniqueFilename(newPost.post_id, file.originalname),
           file.buffer,
           parsedUserId,
           newPost.post_id // Use the newly created post's ID

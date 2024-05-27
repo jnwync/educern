@@ -25,8 +25,16 @@ export interface PostType {
   image?: string;
   user: UserType;
   votes: number;
-  File: File[]
+  File: File[];
   Comment: CommentType[];
+}
+
+export interface FileType {
+  id: number;
+  originalname: string;
+  filename: string;
+  user_id: number;
+  post_id: number;
 }
 
 const NewsFeed = () => {

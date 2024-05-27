@@ -15,14 +15,14 @@ class ImageDAO {
     originalname: string,
     filename: string,
     user_id: number,
-    post_id: number
+    file_id: number
   ): Promise<File> {
     const file = await prisma.file.create({
       data: {
         originalname,
         filename,
         user_id,
-        post_id,
+        post_id: file_id,
       },
     });
 
@@ -45,6 +45,18 @@ class ImageDAO {
     });
 
     return deletedFile;
+  }
+
+  async getFileById(fileId: number): Promise<File | null> {
+    try {
+      const file = await prisma.file.findUnique({
+        where: { id: fileId },
+      });
+      return file;
+    } catch (error) {
+      console.error("Failed to get file by ID:", error);
+      throw new Error("Failed to get file by ID");
+    }
   }
 }
 

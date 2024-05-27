@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { UserType, CommentType, PostType } from "./NewsFeed";
+import { UserType, CommentType, PostType, FileType } from "./NewsFeed";
 
 interface PostProps {
   post: PostType;
@@ -11,7 +11,8 @@ const Post: React.FC<PostProps> = ({ post }) => {
   const [comments, setComments] = useState<CommentType[]>([]);
   const [user, setUser] = useState<UserType | null>(null);
   const [votes, setVotes] = useState<number>(0);
-  const [newComment, setNewComment] = useState<string>("")
+  const [newComment, setNewComment] = useState<string>("");
+  const [files, setFiles] = useState<FileType[]>([]); // State for files
 
   useEffect(() => {
     const fetchComments = async () => {
@@ -61,8 +62,20 @@ const Post: React.FC<PostProps> = ({ post }) => {
       }
     };
 
+    const fetchFiles = async () => {
+      try {
+        const response = await axios.get<FileType[]>(
+          `http://localhost:3000/images/${post.post_id}`
+        );
+        setFiles(response.data);
+      } catch (error) {
+        console.error("Error fetching files", error);
+      }
+    };
+
     fetchUser();
     fetchVotes();
+    fetchFiles();
   }, [post.post_id, post.user]);
 
   const handleLikeClick = async () => {
@@ -91,10 +104,9 @@ const Post: React.FC<PostProps> = ({ post }) => {
     }
   };
 
-
   useEffect(() => {
-    handleCommentSubmit()
-  }, [])
+    handleCommentSubmit();
+  }, []);
 
   return (
     <div className="p-4 mb-4 text-white rounded-lg shadow-md bg-stone-900 border-stone-950">
@@ -113,9 +125,13 @@ const Post: React.FC<PostProps> = ({ post }) => {
       <h2 className="p-3 text-2xl font-bold">{post.caption}</h2>
       <p>{post.content}</p>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {post.image && (
-          <img src={post.image} alt="Post" className="w-full mt-2 rounded-md" />
-        )}
+        {files.map((file) => (
+          <img
+            key={file.id}
+            src={`http://localhost:3000/uploads/${file.filename}`}
+            className="w-full mt-2 rounded-md"
+          />
+        ))}
       </div>
       <div className="flex items-center p-4">
         <button
@@ -144,19 +160,16 @@ const Post: React.FC<PostProps> = ({ post }) => {
           onChange={handleCommentChange}
         />
       </div>
-      <button
-      onClick={handleCommentSubmit}
-      >Send Comment</button>
+      <button onClick={handleCommentSubmit}>Send Comment</button>
       <div className="mt-4">
-        {
-          comments.map((comment) => (
-            <div key={comment.comment_id} className="p-2 mt-2 border-t">
-              <p className="font-semibold">
-                {comment.user.first_name} {comment.user.last_name}
-              </p>
-              <p>{comment.content}</p>
-            </div>
-          ))}
+        {comments.map((comment) => (
+          <div key={comment.comment_id} className="p-2 mt-2 border-t">
+            <p className="font-semibold">
+              {comment.user.first_name} {comment.user.last_name}
+            </p>
+            <p>{comment.content}</p>
+          </div>
+        ))}
       </div>
     </div>
   );
